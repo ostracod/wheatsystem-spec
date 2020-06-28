@@ -66,19 +66,19 @@ pre.code {
             <li><span class="code">u4</span> = Unsigned 4-bit integer</li>
         </ul>
         <pre class="code">Function table entry = [
-    s32 function ID
-    u8 is guarded
-    u32 argument frame size
-    u32 local frame size
-    u32 instruction body file position
+    s32 function ID,
+    u8 is guarded,
+    u32 argument frame size,
+    u32 local frame size,
+    u32 instruction body file position,
     u32 instruction body size
 ]</pre>
         <pre class="code">Bytecode application file = [
-    u32 global frame size
-    u32 function table length
-    u32 application data file position
-    Function table
-    Instruction array
+    u32 global frame size,
+    u32 function table length,
+    u32 application data file position,
+    Function table,
+    Instruction array,
     Application data
 ]</pre>
         <p>File types:</p>
