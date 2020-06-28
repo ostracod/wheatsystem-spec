@@ -134,10 +134,8 @@ pre.code {
         </ul>
         <p>Data types:</p>
         <ul>
-            <li><span class="code">0x0</span> = <span class="code">u8</span></li>
-            <li><span class="code">0x1</span> = <span class="code">u32</span></li>
-            <li><span class="code">0x2</span> = <span class="code">s8</span></li>
-            <li><span class="code">0x3</span> = <span class="code">s32</span></li>
+            <li><span class="code">0x0</span> = <span class="code">s8</span></li>
+            <li><span class="code">0x1</span> = <span class="code">s32</span></li>
         </ul>
         <pre class="code">Constant argument = [
     Argument prefix,
@@ -242,11 +240,18 @@ pre.code {
         </div>
         <p><span class="code">capacityErr</span> error code = <span class="code">0x0C</span></p>
         <div class="description">
-            <p>Thrown if the system has insufficient hardware resources for the operation.</p>
+            <p>Thrown if the system has insufficient hardware resources for the operation. This includes the following circumstances:</p>
+            <ul>
+                <li>An application tries to create a file when the system volume is full</li>
+            </ul>
         </div>
         <p><span class="code">throttleErr</span> error code = <span class="code">0x0D</span></p>
         <div class="description">
-            <p>Thrown if the current application has been killed by another application.</p>
+            <p>Thrown if the current application has been terminated prematurely. This includes the following circumstances:</p>
+            <ul>
+                <li>An application kills another application</li>
+                <li>The system kills another application to free memory</li>
+            </ul>
         </div>
 {INSTRUCTIONS}
     </body>
