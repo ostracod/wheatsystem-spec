@@ -30,7 +30,7 @@ $ allocCreator = 0x05
 > dest = Destination for the result (pointer)
 > alloc = Heap allocation (pointer)
 
-! JUMP INSTRUCTIONS
+! CONTROL FLOW INSTRUCTIONS
 
 $ jmp = 0x10
 # Jumps control flow to another instruction within the current function.
@@ -48,6 +48,12 @@ $ jmpNZ = 0x12
 > instrOffset = File offset from start of instruction body (constant number)
 > cond = Condition value (number)
 * Throws `indexErr` if `instrOffset` is outside instruction body bounds.
+
+$ wait = 0x13
+# Blocks execution until another function invocation performs the `resume` instruction.
+
+$ resume = 0x14
+# Causes all function invocations blocked by the `wait` instruction to continue execution.
 
 ! FUNCTION INSTRUCTIONS
 
@@ -195,7 +201,7 @@ $ appErr = 0x64
 > appHandle = Application file handle (pointer)
 
 $ killApp = 0x65
-# Terminates the given application.
+# Requests for the given application to terminate.
 > appHandle = Application file handle (pointer)
 
 ! FILE INSTRUCTIONS
