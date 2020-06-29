@@ -55,62 +55,80 @@ $ wait = 0x13
 $ resume = 0x14
 # Causes all function invocations blocked by the `wait` instruction to continue execution.
 
+! ERROR INSTRUCTIONS
+
+$ setErrJmp = 0x20
+# Configures an error handler within the current function. If an error is thrown, control flow will jump to the error handler.
+> instrOffset = File offset from start of instruction body (constant number)
+
+$ clrErrJmp = 0x21
+# Removes any error handler from the current function. If an error is thrown, it will be passed to the invoking function.
+
+$ throw = 0x22
+# Throws an error which will be handled by the invoking function. The error code must be in the range of `s8`.
+> errCode = Error code (number)
+* Throws `numRangeErr` if `code` is not in the range of `s8`.
+
+$ err = 0x23
+# Retrieves the code of the last error which was caught in the current function. The result will be -1 if no error has been caught by an error handler.
+> dest = Destination for the error code (number)
+
 ! FUNCTION INSTRUCTIONS
 
-$ findFunc = 0x20
+$ findFunc = 0x30
 # Searches for a function with the given ID in the given application. If such a function is not found, the result is -1.
 > dest = Destination for the function index (number)
 > appHandle = Application file handle (pointer)
 > funcId = Function ID (number)
 
-$ call = 0x21
+$ call = 0x31
 # Invokes a function which is defined in the current application.
 > funcIndex = Index of a function in the function table (number)
 
-$ callRemote = 0x22
+$ callRemote = 0x32
 # Invokes a function which may be defined in another application.
 > appHandle = Application file handle (pointer)
 > funcIndex = Index of a function in the function table (number)
 
-$ ret = 0x23
+$ ret = 0x33
 # Exits the current function and returns control flow to the invoking function.
 
-$ caller = 0x24
+$ caller = 0x34
 # Retrieves the file handle of the application which invoked the current function.
 > dest = Destination for the application file handle (pointer)
 
 ! BITWISE INSTRUCTIONS
 
-$ bNot = 0x30
+$ bNot = 0x40
 # Performs bitwise NOT with the given value.
 > dest = Destination for the result (number)
 > value = Operand (number)
 
-$ bOr = 0x31
+$ bOr = 0x41
 # Performs bitwise OR with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 
-$ bAnd = 0x32
+$ bAnd = 0x42
 # Performs bitwise AND with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 
-$ bXor = 0x33
+$ bXor = 0x43
 # Performs bitwise XOR with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 
-$ bLeft = 0x34
+$ bLeft = 0x44
 # Performs bitshift left with the given values.
 > dest = Destination for the result (number)
 > value1 = Value to shift (number)
 > value2 = Amount by which to shift (number)
 
-$ bRight = 0x35
+$ bRight = 0x45
 # Performs bitshift right with the given values.
 > dest = Destination for the result (number)
 > value1 = Value to shift (number)
@@ -118,25 +136,25 @@ $ bRight = 0x35
 
 ! COMPARISON INSTRUCTIONS
 
-$ equ = 0x40
+$ equ = 0x50
 # Determines whether the given values are equal.
 > dest = Destination for the result (number)
 > value1 = First operand (number or pointer)
 > value2 = Second operand (number or pointer)
 
-$ nEqu = 0x41
+$ nEqu = 0x51
 # Determines whether the given values are not equal.
 > dest = Destination for the result (number)
 > value1 = First operand (number or pointer)
 > value2 = Second operand (number or pointer)
 
-$ gre = 0x42
+$ gre = 0x52
 # Determines whether the first value is greater than the second value.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 
-$ nGre = 0x43
+$ nGre = 0x53
 # Determines whether the first value is not greater than the second value.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
@@ -144,32 +162,32 @@ $ nGre = 0x43
 
 ! ARITHMETIC INSTRUCTIONS
 
-$ add = 0x50
+$ add = 0x60
 # Performs addition with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 
-$ sub = 0x51
+$ sub = 0x61
 # Performs subtraction with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 
-$ mul = 0x52
+$ mul = 0x62
 # Performs multiplication with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 
-$ div = 0x53
+$ div = 0x63
 # Performs division with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
 > value2 = Second operand (number)
 * Throws `numRangeErr` if `value2` is zero.
 
-$ mod = 0x54
+$ mod = 0x64
 # Performs the modulo operation with the given values.
 > dest = Destination for the result (number)
 > value1 = First operand (number)
@@ -178,86 +196,85 @@ $ mod = 0x54
 
 ! APPLICATION INSTRUCTIONS
 
-$ launch = 0x60
+$ launch = 0x70
 # Launches the given application if it is not already running.
 > appName = Application file name (pointer)
 
-$ thisApp = 0x61
+$ thisApp = 0x71
 # Retrieves the file handle of the current application.
 > dest = Destination for the application file handle (pointer)
 
-$ quitApp = 0x62
-# Terminates the current application. If the application is exiting without an error, `errCode` should be -1.
-> errCode = Error code (number)
+$ quitApp = 0x72
+# Terminates the current application.
 
-$ appIsRunning = 0x63
+$ appIsRunning = 0x73
 # Retrieves whether the given application is running.
 > dest = Destination for the result (number)
 > appHandle = Application file handle (pointer)
 
-$ appErr = 0x64
-# Retrieves the code of the error which terminated the given application. If the application has no error, the result is -1.
+$ appInitErr = 0x74
+# Retrieves the code of the unhandled error which terminated the `init` function of the given application. The result will be -1 if the given application does not implement `init`, or if the `init` function of the given application was not terminated by an unhandled error.
 > dest = Destination for the result (number)
 > appHandle = Application file handle (pointer)
 
-$ killApp = 0x65
+$ killApp = 0x75
 # Requests for the given application to terminate.
 > appHandle = Application file handle (pointer)
 
 ! FILE INSTRUCTIONS
 
-$ allFileNames = 0x70
+$ allFileNames = 0x80
 # Retrieves a list of all file names in the system volume.
 > dest = Destination for the list of file names (pointer)
 
-$ newFile = 0x71
+$ newFile = 0x81
 # Creates a new file.
 > name = Name of the new file (pointer)
 > type = Type of the new file (number)
 > isGuarded = Whether the new file should be guarded (number)
 > size = Size of the new file (number)
 
-$ delFile = 0x72
+$ delFile = 0x82
 # Deletes the given file.
 > name = File name (pointer)
 
-$ fileExists = 0x73
+$ fileExists = 0x83
 # Retrieves whether a file with the given name exists.
 > dest = Destination for the result (number)
 > name = File name (pointer)
 
-$ fileType = 0x74
+$ fileType = 0x84
 # Retrieves the type of the given file.
 > dest = Destination for the file type (number)
 > name = File name (pointer)
 
-$ fileIsGuarded = 0x75
+$ fileIsGuarded = 0x85
 # Retrieves whether the given file is guarded.
 > dest = Destination for the result (number)
 > name = File name (pointer)
 
-$ fileSize = 0x76
+$ fileSize = 0x86
 # Retrieves the size of the given file.
 > dest = Destination for the file size (number)
 > name = File name (pointer)
 
 ! FILE HANDLE INSTRUCTIONS
 
-$ openFile = 0x80
+$ openFile = 0x90
 # Retrieves a file handle for the given file.
 > dest = Destination for the file handle (pointer)
 > name = File name (pointer)
 
-$ closeFile = 0x81
+$ closeFile = 0x91
 # Indicates to the system that the current application has finished using the given file handle.
 > fileHandle = File handle (pointer)
 
-$ fileName = 0x82
+$ fileName = 0x92
 # Retrieves the name of the given file.
 > dest = Destination for the file name (pointer)
 > fileHandle = File handle (pointer)
 
-$ readFile = 0x83
+$ readFile = 0x93
 # Reads a sequences of bytes from the given file into a buffer.
 > dest = Destination for file data (number)
 > fileHandle = File handle (pointer)
@@ -266,7 +283,7 @@ $ readFile = 0x83
 * Throws `indexErr` if `pos` is outside file bounds.
 * Throws `numRangeErr` if `size` reaches outside file or allocation bounds.
 
-$ wrtFile = 0x84
+$ wrtFile = 0x94
 # Writes a sequences of bytes from the given buffer into a file.
 > fileHandle = File handle (pointer)
 > pos = File position (number)
@@ -277,34 +294,34 @@ $ wrtFile = 0x84
 
 ! PERMISSION INSTRUCTIONS
 
-$ hasAdminPerm = 0x90
+$ hasAdminPerm = 0xA0
 # Retrieves whether the given application holds admin permission.
 > dest = Destination for the result (number)
 > appHandle = Application file handle (pointer)
 
-$ giveAdminPerm = 0x91
+$ giveAdminPerm = 0xA1
 # Grants admin permission to the given application.
 > appHandle = Application file handle (pointer)
 
-$ delAdminPerm = 0x92
+$ delAdminPerm = 0xA2
 # Deletes admin permission from the given application.
 > appHandle = Application file handle (pointer)
 
 ! RESOURCE INSTRUCTIONS
 
-$ memSize = 0xA0
+$ memSize = 0xB0
 # Retrieves the total amount of memory in the system.
 > dest = Destination for the amount (number)
 
-$ memSizeLeft = 0xA1
+$ memSizeLeft = 0xB1
 # Retrieves the amount of unused memory remaining in the system.
 > dest = Destination for the amount (number)
 
-$ volSize = 0xA2
+$ volSize = 0xB2
 # Retrieves the total amount of storage in the system volume.
 > dest = Destination for the amount (number)
 
-$ volSizeLeft = 0xA3
+$ volSizeLeft = 0xB3
 # Retrieves the amount of unused storage remaining in the system volume.
 > dest = Destination for the amount (number)
 

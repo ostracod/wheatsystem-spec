@@ -71,7 +71,6 @@ pre.code {
             <li>The application system does not verify dependencies or compatibility.</li>
             <li>The bytecode runtime environment may only use a single CPU core.</li>
             <li>The bytecode has no native instructions for floating point operations.</li>
-            <li>Any error will cause an application to terminate, and cannot be handled.</li>
             <li>The permission system does not support granularity beyond admin permission.</li>
         </ul>
         <p class="title2">FILE SYSTEM</p>
@@ -98,8 +97,7 @@ pre.code {
             <li>If function ID is negative, the function is defined as part of the WheatSystem specification.</li>
             <li>If function ID is positive, the function is defined as part of some third-party specification.</li>
         </ul>
-        <p>If system memory becomes full, the system will throw <span class="code">throttleErr</span> in a running application to free memory. The system will first favor throttling applications which do not hold admin permission, and then applications which are using the most memory.</p>
-        <p>When an error terminates an application, the error code becomes available for other applications to read. The error code of an application is cleared when the application launches again.</p>
+        <p>A list of WheatSystem function IDs is available in a later section of this document.</p>
         <p class="title2">PERMISSION SYSTEM</p>
         <p>Every application may or may not hold admin permission. Applications holding admin permission may access all resources available in the system. Admin permission should be reserved for highly trusted applications.</p>
         <p>A resource is "guarded" if the resource may only be accessed by its owner or an application holding admin permission. Operations which may be guarded include:</p>
@@ -111,14 +109,44 @@ pre.code {
         <p>If an application without admin permission tries to perform a guarded action, the system will throw <span class="code">permErr</span> in the application.</p>
         </p>Access to the <span class="code">killApp</span> instruction is guarded. If an application which does not hold admin permission tries to perform <span class="code">killApp</span>, the system will throw <span class="code">permErr</span>.</p>
         <p>An application which holds admin permission may give or remove admin permission to any other application. Ownership of admin permission is persisted in non-volatile storage.</li>
-        <p class="title2">SYSTEM FUNCTION IDS</p>
-        <p>TODO: Write this section.</p>
+        <p class="title2">RESOURCE SYSTEM</p>
+        <p>The resource system distributes hardware resources to applications, including memory  and non-volatile storage.</p>
+        <p>If system memory becomes full, the system will attempt to kill a running application to free memory. The system will attempt the following actions to kill an application, ordered from most favorable to least favorable:</p>
+        <ol>
+            <li>If the application implements a <span class="code">kill</span> function, call the <span class="code">kill</span> function.</li>
+            <li>Throw <span class="code">throttleErr</span> in the application.</li>
+            <li>Terminate the child in a dirty state.</li>
+        </ol>
+        <p>When throttling applications to free memory, the system will favor the following applications:</p>
+        <ul>
+            <li>Applications which do not hold admin permission</li>
+            <li>Applications which are using a lot of memory</li>
+        </ul>
+        <p>If an application attempts to create a file when the system volume is full, the resource system will throw <span class="code">capacityError</span>. The application will not be able to create more files until volume space is freed.</p>
+        <p class="title2">FUNCTION IDS</p>
+        <p>The WheatSystem specification includes the function IDs listed below.</p>
+        <pre class="code">init()</pre>
+        <div class="description">
+            <p>Triggered by the application system immediately after an application launches. If an application does not implement <span class="code">init</span>, the application will remain inactive after launch.</p>
+            <ul>
+                <li><span class="code">init</span> function ID = -1</li>
+            </ul>
+        </div>
+        <pre class="code">kill()</pre>
+        <div class="description">
+            <p>Requests for an application to terminate. The application should clean up any volatile resources.</p>
+            <ul>
+                <li><span class="code">kill</span> function ID = -2</li>
+            </ul>
+        </div>
+        <p>TODO: Define more functions.</p>
         <p class="title2">ABBREVIATION GLOSSARY</p>
         <p>These abbreviations are used throughout WheatSystem documentation.</p>
         <p><span class="code">arg</span> = Argument</p>
         <p><span class="code">alloc</span> = Allocation</p>
         <p><span class="code">app</span> = Application</p>
         <p><span class="code">buff</span> = Buffer</p>
+        <p><span class="code">clr</span> = Clear</p>
         <p><span class="code">cond</span> = Condition</p>
         <p><span class="code">del</span> = Delete</p>
         <p><span class="code">dest</span> = Destination</p>
