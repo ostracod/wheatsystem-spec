@@ -134,12 +134,93 @@ pre.code {
         </div>
         <pre class="code">kill()</pre>
         <div class="description">
-            <p>Requests for an application to terminate. The application should clean up any volatile resources.</p>
+            <p>Requests for the receiving application to terminate. The application should clean up any volatile resources.</p>
             <ul>
                 <li><span class="code">kill</span> function ID = -2</li>
             </ul>
         </div>
-        <p>TODO: Define more functions.</p>
+        <pre class="code">listenTerm()</pre>
+        <div class="description">
+            <p>Causes the calling application to become an observer of the receiving terminal driver. When the terminal driver registers a typed key, it will invoke the <span class="code">termInput</span> function of its observer. Each terminal driver may have at most one observer. If another application invokes <span class="code">listenTerm</span>, it will become the new observer.</p>
+            <ul>
+                <li><span class="code">listenTerm</span> function ID = -3</li>
+            </ul>
+        </div>
+        <pre class="code">termSize(
+    s32 widthDest,
+    s32 heightDest
+)</pre>
+        <div class="description">
+            <p>Retrieves the dimensions of the terminal controlled by the receiving terminal driver. The dimensions are measured in number of characters.</p>
+            <ul>
+                <li><span class="code">termSize</span> function ID = -4</li>
+                <li><span class="code">widthDest</span> = Destination for the width</li>
+                <li><span class="code">heightDest</span> = Destination for the height</li>
+            </ul>
+        </div>
+        <pre class="code">wrtTerm(
+    s32 x,
+    s32 y,
+    s32 text
+)</pre>
+        <div class="description">
+            <p>Displays text on the terminal of the receiving terminal driver. Text will wrap around to the next line after it reaches the end of the screen.</p>
+            <ul>
+                <li><span class="code">wrtTerm</span> function ID = -5</li>
+                <li><span class="code">x</span> = Horizontal coordinate</li>
+                <li><span class="code">y</span> = Vertical coordinate</li>
+                <li><span class="code">text</span> = Pointer to text allocation</li>
+            </ul>
+        </div>
+        <pre class="code">termInput(
+    s32 key
+)</pre>
+        <div class="description">
+            <p>Invoked by a terminal driver to notify the receiving observer when a key has been typed.</p>
+            <ul>
+                <li><span class="code">termInput</span> function ID = -6</li>
+                <li><span class="code">key</span> = Typed key code</li>
+            </ul>
+        </div>
+        <pre class="code">startSerial(
+    s32 baudRate
+)</pre>
+        <div class="description">
+            <p>Causes the receiving serial driver to open its serial port, and assigns the calling application as the observer of the driver. When the serial driver registers input data, it will invoke the <span class="code">serialInput</span> function of its observer.</p>
+            <ul>
+                <li><span class="code">startSerial</span> function ID = -7</li>
+                <li><span class="code">baudRate</span> = Serial port baud rate</li>
+            </ul>
+        </div>
+        <pre class="code">stopSerial()</pre>
+        <div class="description">
+            <p>Causes the receiving serial driver to close its serial port. The driver will no longer invoke <span class="code">serialInput</span> on its observer.</p>
+            <ul>
+                <li><span class="code">stopSerial</span> function ID = -8</li>
+            </ul>
+        </div>
+        <pre class="code">wrtSerial(
+    s32 buff
+)</pre>
+        <div class="description">
+            <p>Causes the receiving serial driver to output data over its serial port.</p>
+            <ul>
+                <li><span class="code">wrtSerial</span> function ID = -9</li>
+                <li><span class="code">buff</span> = Pointer to buffer allocation</li>
+            </ul>
+        </div>
+        <pre class="code">serialInput(
+    s8 value
+)</pre>
+        <div class="description">
+            <p>Invoked by a serial driver to notify the receiving observer when a serial byte has been ingested.</p>
+            <ul>
+                <li><span class="code">serialInput</span> function ID = -10</li>
+                <li><span class="code">value</span> = Received serial data</li>
+            </ul>
+        </div>
+        <p>A terminal driver implements the functions <span class="code">listenTerm</span>, <span class="code">termSize</span>, and <span class="code">wrtTerm</span>. The standard system terminal driver has the file name <span class="code">term</span>.</p>
+        <p>A serial driver implements the functions <span class="code">startSerial</span>, <span class="code">stopSerial</span>, and <span class="code">wrtSerial</span>. The standard system serial drivers have the file name <span class="code">serialN</span>, where <span class="code">N</span> is a non-negative integer.</p>
         <p class="title2">ABBREVIATION GLOSSARY</p>
         <p>These abbreviations are used throughout WheatSystem documentation.</p>
         <p><span class="code">arg</span> = Argument</p>
@@ -164,6 +245,7 @@ pre.code {
         <p><span class="code">pos</span> = Position</p>
         <p><span class="code">ptr</span> = Pointer</p>
         <p><span class="code">src</span> = Source</p>
+        <p><span class="code">term</span> = Terminal</p>
         <p><span class="code">vol</span> = Volume</p>
         <p><span class="code">wrt</span> = Write</p>
     </body>
