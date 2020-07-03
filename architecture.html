@@ -97,7 +97,7 @@ pre.code {
             <li>If function ID is negative, the function is defined as part of the WheatSystem specification.</li>
             <li>If function ID is positive, the function is defined as part of some third-party specification.</li>
         </ul>
-        <p>A list of WheatSystem function IDs is available in a later section of this document.</p>
+        <p>Lists of WheatSystem function IDs are available in later sections of this document.</p>
         <p class="title2">PERMISSION SYSTEM</p>
         <p>Every application may or may not hold admin permission. Applications holding admin permission may access all resources available in the system. Admin permission should be reserved for highly trusted applications.</p>
         <p>A resource is "guarded" if the resource may only be accessed by its owner or an application holding admin permission. Operations which may be guarded include:</p>
@@ -123,8 +123,8 @@ pre.code {
             <li>Applications which are using a lot of memory</li>
         </ul>
         <p>If an application attempts to create a file when the system volume is full, the resource system will throw <span class="code">capacityError</span>. The application will not be able to create more files until volume space is freed.</p>
-        <p class="title2">FUNCTION IDS</p>
-        <p>The WheatSystem specification includes the function IDs listed below.</p>
+        <p class="title2">APPLICATION FUNCTIONS</p>
+        <p>Any WheatSystem application may implement the functions <span class="code">init</span> and <span class="code">kill</span>. These functions help the system manage the lifecycle of applications.</p>
         <pre class="code">init()</pre>
         <div class="description">
             <p>Triggered by the application system immediately after an application launches. If an application does not implement <span class="code">init</span>, the application will remain inactive after launch.</p>
@@ -139,6 +139,8 @@ pre.code {
                 <li><span class="code">kill</span> function ID = -2</li>
             </ul>
         </div>
+        <p class="title2">TERMINAL DRIVER FUNCTIONS</p>
+        <p>A terminal driver implements the functions <span class="code">listenTerm</span>, <span class="code">termSize</span>, and <span class="code">wrtTerm</span>. The standard system terminal driver is optional for WheatSystem distributions. If available, the standard system terminal driver has the file name <span class="code">term</span>.</p>
         <pre class="code">listenTerm()</pre>
         <div class="description">
             <p>Causes the calling application to become an observer of the receiving terminal driver. When the terminal driver registers a typed key, it will invoke the <span class="code">termInput</span> function of its observer. Each terminal driver may have at most one observer. If another application invokes <span class="code">listenTerm</span>, it will become the new observer.</p>
@@ -173,7 +175,7 @@ pre.code {
             </ul>
         </div>
         <pre class="code">termInput(
-    s32 key
+    s8 key
 )</pre>
         <div class="description">
             <p>Invoked by a terminal driver to notify the receiving observer when a key has been typed.</p>
@@ -181,7 +183,20 @@ pre.code {
                 <li><span class="code">termInput</span> function ID = -6</li>
                 <li><span class="code">key</span> = Typed key code</li>
             </ul>
+            <p>Terminal key codes for visible characters have ASCII values. Other key codes include the following:</p>
+            <ul>
+                <li>Space = 32</li>
+                <li>Newline = 10</li>
+                <li>Backspace = 127</li>
+                <li>Escape = 27</li>
+                <li>Left = -1</li>
+                <li>Right = -2</li>
+                <li>Up = -3</li>
+                <li>Down = -4</li>
+            </ul>
         </div>
+        <p class="title2">SERIAL DRIVER FUNCTIONS</p>
+        <p>A serial driver implements the functions <span class="code">startSerial</span>, <span class="code">stopSerial</span>, and <span class="code">wrtSerial</span>. System serial drivers are optional for WheatSystem distributions. If available, standard system serial drivers have the file names <span class="code">serialN</span>, where <span class="code">N</span> is a non-negative integer.</p>
         <pre class="code">startSerial(
     s32 baudRate
 )</pre>
@@ -219,8 +234,6 @@ pre.code {
                 <li><span class="code">value</span> = Received serial data</li>
             </ul>
         </div>
-        <p>A terminal driver implements the functions <span class="code">listenTerm</span>, <span class="code">termSize</span>, and <span class="code">wrtTerm</span>. The standard system terminal driver has the file name <span class="code">term</span>.</p>
-        <p>A serial driver implements the functions <span class="code">startSerial</span>, <span class="code">stopSerial</span>, and <span class="code">wrtSerial</span>. The standard system serial drivers have the file name <span class="code">serialN</span>, where <span class="code">N</span> is a non-negative integer.</p>
         <p class="title2">ABBREVIATION GLOSSARY</p>
         <p>These abbreviations are used throughout WheatSystem documentation.</p>
         <p><span class="code">arg</span> = Argument</p>

@@ -6,26 +6,33 @@ $ wrt = 0x00
 > dest = Destination for writing (number or pointer)
 > value = Value to write (number or pointer)
 
-$ newArgFrame = 0x01
+$ wrtBuff = 0x01
+# Copies a sequence of bytes between memory locations.
+> dest = Start of the destination buffer (number or pointer)
+> buff = Start of the source buffer (number or pointer)
+> size = Number of bytes in the buffer (number)
+* Throws `numRangeErr` if `size` reaches outside allocation bounds.
+
+$ newArgFrame = 0x02
 # Creates a new argument frame to feed into the next function invocation.
 > size = Size of the new argument frame (number)
 
-$ newAlloc = 0x02
+$ newAlloc = 0x03
 # Creates a new heap allocation.
 > dest = Destination for the new heap allocation (pointer)
 > isGuarded = Whether the new heap allocation should be guarded (number)
 > size = Size of the new heap allocation (number)
 
-$ delAlloc = 0x03
+$ delAlloc = 0x04
 # Deletes a heap allocation.
 > alloc = Heap allocation (pointer)
 
-$ allocSize = 0x04
+$ allocSize = 0x05
 # Retrieves the size of a heap allocation.
 > dest = Destination for the size (number)
 > alloc = Heap allocation (pointer)
 
-$ allocCreator = 0x05
+$ allocCreator = 0x06
 # Retrieves the file handle of the application which created the given heap allocation. The result is null if the allocation was created by the system.
 > dest = Destination for the result (pointer)
 > alloc = Heap allocation (pointer)
