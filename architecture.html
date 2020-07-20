@@ -196,42 +196,96 @@ pre.code {
             </ul>
         </div>
         <p class="title2">SERIAL DRIVER FUNCTIONS</p>
-        <p>A serial driver implements the functions <span class="code">startSerial</span>, <span class="code">stopSerial</span>, and <span class="code">wrtSerial</span>. System serial drivers are optional for WheatSystem distributions. If available, standard system serial drivers have the file names <span class="code">serialN</span>, where <span class="code">N</span> is a non-negative integer.</p>
+        <p>A serial driver implements the functions <span class="code">startSerial</span>, <span class="code">stopSerial</span>, and <span class="code">wrtSerial</span>. The standard system serial driver is optional for WheatSystem distributions. If available, the standard system serial driver has the file name <span class="code">serial</span>.</p>
         <pre class="code">startSerial(
+    s8 port,
     s32 baudRate
 )</pre>
         <div class="description">
-            <p>Causes the receiving serial driver to open its serial port, and assigns the calling application as the observer of the driver. When the serial driver registers input data, it will invoke the <span class="code">serialInput</span> function of its observer.</p>
+            <p>Causes the receiving serial driver to open the given serial port, and assigns the calling application as an observer. When the port receives input data, the serial driver will will invoke the <span class="code">serialInput</span> function on the port's observer.</p>
             <ul>
                 <li><span class="code">startSerial</span> function ID = -7</li>
+                <li><span class="code">port</span> = Serial port number</li>
                 <li><span class="code">baudRate</span> = Serial port baud rate</li>
             </ul>
         </div>
-        <pre class="code">stopSerial()</pre>
+        <pre class="code">stopSerial(
+    s8 port
+)</pre>
         <div class="description">
-            <p>Causes the receiving serial driver to close its serial port. The driver will no longer invoke <span class="code">serialInput</span> on its observer.</p>
+            <p>Causes the receiving serial driver to close the given serial port. The port will no longer send or receive data.</p>
             <ul>
                 <li><span class="code">stopSerial</span> function ID = -8</li>
+                <li><span class="code">port</span> = Serial port number</li>
             </ul>
         </div>
         <pre class="code">wrtSerial(
+    s8 port,
     s32 buff
 )</pre>
         <div class="description">
-            <p>Causes the receiving serial driver to output data over its serial port.</p>
+            <p>Causes the receiving serial driver to output data over the given serial port.</p>
             <ul>
                 <li><span class="code">wrtSerial</span> function ID = -9</li>
+                <li><span class="code">port</span> = Serial port number</li>
                 <li><span class="code">buff</span> = Pointer to buffer allocation</li>
             </ul>
         </div>
         <pre class="code">serialInput(
+    s8 port,
     s8 value
 )</pre>
         <div class="description">
             <p>Invoked by a serial driver to notify the receiving observer when a serial byte has been ingested.</p>
             <ul>
                 <li><span class="code">serialInput</span> function ID = -10</li>
+                <li><span class="code">port</span> = Serial port number</li>
                 <li><span class="code">value</span> = Received serial data</li>
+            </ul>
+        </div>
+        <p class="title2">GPIO DRIVER FUNCTIONS</p>
+        <p>A GPIO driver implements the functions <span class="code">setGpioMode</span>, <span class="code">readGpio</span>, and <span class="code">wrtGpio</span>. The standard system GPIO driver is optional for WheatSystem distributions. If available, the standard system GPIO driver has the file name <span class="code">gpio</span>.</p>
+        <pre class="code">setGpioMode(
+    s32 pin,
+    s8 mode
+)</pre>
+        <div class="description">
+            <p>Sets the I/O mode of the given GPIO pin.</p>
+            <ul>
+                <li><span class="code">setGpioMode</span> function ID = -11</li>
+                <li><span class="code">pin</span> = GPIO pin number</li>
+                <li><span class="code">mode</span> = I/O mode</li>
+            </ul>
+            <p>Available I/O modes include the following:</p>
+            <ul>
+                <li>Digital read = 0</li>
+                <li>Analog read = 1</li>
+                <li>Digital write = 2</li>
+                <li>Analog write = 3</li>
+            </ul>
+        </div>
+        <pre class="code">readGpio(
+    s32 dest,
+    s32 pin
+)</pre>
+        <div class="description">
+            <p>Reads a digital or analog value from the given GPIO pin.</p>
+            <ul>
+                <li><span class="code">readGpio</span> function ID = -12</li>
+                <li><span class="code">dest</span> = Destination for the value</li>
+                <li><span class="code">pin</span> = GPIO pin number</li>
+            </ul>
+        </div>
+        <pre class="code">wrtGpio(
+    s32 pin,
+    s32 value
+)</pre>
+        <div class="description">
+            <p>Writes a digital or analog value to the given GPIO pin.</p>
+            <ul>
+                <li><span class="code">wrtGpio</span> function ID = -13</li>
+                <li><span class="code">pin</span> = GPIO pin number</li>
+                <li><span class="code">value</span> = Value to write</li>
             </ul>
         </div>
         <p class="title2">ABBREVIATION GLOSSARY</p>
