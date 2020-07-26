@@ -77,7 +77,7 @@ $ throw = 0x22
 * Throws `numRangeErr` if `code` is not in the range of `s8`.
 
 $ err = 0x23
-# Retrieves the code of the last error which was caught in the current function. The result will be -1 if no error has been caught by an error handler.
+# Retrieves the code of the last error which was caught in the current function. The result will be 0 if no error has been caught by an error handler.
 > dest = Destination for the error code (number)
 
 ! FUNCTION INSTRUCTIONS
@@ -205,7 +205,7 @@ $ mod = 0x64
 
 $ launch = 0x70
 # Launches the given application if it is not already running.
-> appName = Application file name (pointer)
+> appHandle = Application file handle (pointer)
 
 $ thisApp = 0x71
 # Retrieves the file handle of the current application.
@@ -220,7 +220,7 @@ $ appIsRunning = 0x73
 > appHandle = Application file handle (pointer)
 
 $ appInitErr = 0x74
-# Retrieves the code of the unhandled error which terminated the `init` function of the given application. The result will be -1 if the given application does not implement `init`, or if the `init` function of the given application was not terminated by an unhandled error.
+# Retrieves the code of the unhandled error which terminated the `init` function of the given application. The result will be 0 if the given application has no associated `init` error. The `init` error will persist until `appHandle` is recycled by the system, or until the application is launched again.
 > dest = Destination for the result (number)
 > appHandle = Application file handle (pointer)
 

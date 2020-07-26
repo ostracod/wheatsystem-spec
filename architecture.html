@@ -94,8 +94,8 @@ pre.code {
         <p>Every application has a function table which defines all functions available in the application. Each function has a signed 32-bit integer ID to help preserve compatibility regardless of function table ordering. The sign of each function ID hold special significance:</p>
         <ul>
             <li>If function ID is zero, the function is not intended to be used externally.</li>
-            <li>If function ID is negative, the function is defined as part of the WheatSystem specification.</li>
-            <li>If function ID is positive, the function is defined as part of some third-party specification.</li>
+            <li>If function ID is positive, the function is defined as part of the WheatSystem specification.</li>
+            <li>If function ID is negative, the function is defined as part of some third-party specification.</li>
         </ul>
         <p>Lists of WheatSystem function IDs are available in later sections of this document.</p>
         <p class="title2">PERMISSION SYSTEM</p>
@@ -129,14 +129,14 @@ pre.code {
         <div class="description">
             <p>Triggered by the application system immediately after an application launches. If an application does not implement <span class="code">init</span>, the application will remain inactive after launch.</p>
             <ul>
-                <li><span class="code">init</span> function ID = -1</li>
+                <li><span class="code">init</span> function ID = 1</li>
             </ul>
         </div>
         <pre class="code">kill()</pre>
         <div class="description">
             <p>Requests for the receiving application to terminate. The application should clean up any volatile resources.</p>
             <ul>
-                <li><span class="code">kill</span> function ID = -2</li>
+                <li><span class="code">kill</span> function ID = 2</li>
             </ul>
         </div>
         <p class="title2">TERMINAL DRIVER FUNCTIONS</p>
@@ -145,7 +145,7 @@ pre.code {
         <div class="description">
             <p>Causes the calling application to become an observer of the receiving terminal driver. When the terminal driver registers a typed key, it will invoke the <span class="code">termInput</span> function of its observer. Each terminal driver may have at most one observer. If another application invokes <span class="code">listenTerm</span>, it will become the new observer.</p>
             <ul>
-                <li><span class="code">listenTerm</span> function ID = -3</li>
+                <li><span class="code">listenTerm</span> function ID = 3</li>
             </ul>
         </div>
         <pre class="code">termSize(
@@ -155,7 +155,7 @@ pre.code {
         <div class="description">
             <p>Retrieves the dimensions of the terminal controlled by the receiving terminal driver. The dimensions are measured in number of characters.</p>
             <ul>
-                <li><span class="code">termSize</span> function ID = -4</li>
+                <li><span class="code">termSize</span> function ID = 4</li>
                 <li><span class="code">widthDest</span> = Destination for the width</li>
                 <li><span class="code">heightDest</span> = Destination for the height</li>
             </ul>
@@ -168,7 +168,7 @@ pre.code {
         <div class="description">
             <p>Displays text on the terminal of the receiving terminal driver. Text will wrap around to the next line after it reaches the end of the screen.</p>
             <ul>
-                <li><span class="code">wrtTerm</span> function ID = -5</li>
+                <li><span class="code">wrtTerm</span> function ID = 5</li>
                 <li><span class="code">x</span> = Horizontal coordinate</li>
                 <li><span class="code">y</span> = Vertical coordinate</li>
                 <li><span class="code">text</span> = Pointer to text allocation</li>
@@ -180,7 +180,7 @@ pre.code {
         <div class="description">
             <p>Invoked by a terminal driver to notify the receiving observer when a key has been typed.</p>
             <ul>
-                <li><span class="code">termInput</span> function ID = -6</li>
+                <li><span class="code">termInput</span> function ID = 6</li>
                 <li><span class="code">key</span> = Typed key code</li>
             </ul>
             <p>Terminal key codes for visible characters have ASCII values. Other key codes include the following:</p>
@@ -204,7 +204,7 @@ pre.code {
         <div class="description">
             <p>Causes the receiving serial driver to open the given serial port, and assigns the calling application as an observer. When the port receives input data, the serial driver will will invoke the <span class="code">serialInput</span> function on the port's observer.</p>
             <ul>
-                <li><span class="code">startSerial</span> function ID = -7</li>
+                <li><span class="code">startSerial</span> function ID = 7</li>
                 <li><span class="code">port</span> = Serial port number</li>
                 <li><span class="code">baudRate</span> = Serial port baud rate</li>
             </ul>
@@ -215,7 +215,7 @@ pre.code {
         <div class="description">
             <p>Causes the receiving serial driver to close the given serial port. The port will no longer send or receive data.</p>
             <ul>
-                <li><span class="code">stopSerial</span> function ID = -8</li>
+                <li><span class="code">stopSerial</span> function ID = 8</li>
                 <li><span class="code">port</span> = Serial port number</li>
             </ul>
         </div>
@@ -226,7 +226,7 @@ pre.code {
         <div class="description">
             <p>Causes the receiving serial driver to output data over the given serial port.</p>
             <ul>
-                <li><span class="code">wrtSerial</span> function ID = -9</li>
+                <li><span class="code">wrtSerial</span> function ID = 9</li>
                 <li><span class="code">port</span> = Serial port number</li>
                 <li><span class="code">buff</span> = Pointer to buffer allocation</li>
             </ul>
@@ -238,7 +238,7 @@ pre.code {
         <div class="description">
             <p>Invoked by a serial driver to notify the receiving observer when a serial byte has been ingested.</p>
             <ul>
-                <li><span class="code">serialInput</span> function ID = -10</li>
+                <li><span class="code">serialInput</span> function ID = 10</li>
                 <li><span class="code">port</span> = Serial port number</li>
                 <li><span class="code">value</span> = Received serial data</li>
             </ul>
@@ -252,7 +252,7 @@ pre.code {
         <div class="description">
             <p>Sets the I/O mode of the given GPIO pin.</p>
             <ul>
-                <li><span class="code">setGpioMode</span> function ID = -11</li>
+                <li><span class="code">setGpioMode</span> function ID = 11</li>
                 <li><span class="code">pin</span> = GPIO pin number</li>
                 <li><span class="code">mode</span> = I/O mode</li>
             </ul>
@@ -271,7 +271,7 @@ pre.code {
         <div class="description">
             <p>Reads a digital or analog value from the given GPIO pin.</p>
             <ul>
-                <li><span class="code">readGpio</span> function ID = -12</li>
+                <li><span class="code">readGpio</span> function ID = 12</li>
                 <li><span class="code">dest</span> = Destination for the value</li>
                 <li><span class="code">pin</span> = GPIO pin number</li>
             </ul>
@@ -283,7 +283,7 @@ pre.code {
         <div class="description">
             <p>Writes a digital or analog value to the given GPIO pin.</p>
             <ul>
-                <li><span class="code">wrtGpio</span> function ID = -13</li>
+                <li><span class="code">wrtGpio</span> function ID = 13</li>
                 <li><span class="code">pin</span> = GPIO pin number</li>
                 <li><span class="code">value</span> = Value to write</li>
             </ul>

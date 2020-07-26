@@ -155,18 +155,18 @@ pre.code {
     Allocation index as nested argument
 ]</pre>
         <p class="title2">SYSTEM ERRORS</p>
-        <p><span class="code">genericErr</span> error code = <span class="code">0x00</span></p>
+        <p><span class="code">genericErr</span> error code = <span class="code">0x01</span></p>
         <div class="description">
             <p>Thrown if a problem occurs which cannot be described by a more specific error code.</p>
         </div>
-        <p><span class="code">noImplErr</span> error code = <span class="code">0x01</span></p>
+        <p><span class="code">noImplErr</span> error code = <span class="code">0x02</span></p>
         <div class="description">
             <p>Thrown if no implementation is available for the given operation. This includes the following circumstances:</p>
             <ul>
                 <li>The interpreter tries to evaluate an instruction which has an unknown opcode</li>
             </ul>
         </div>
-        <p><span class="code">typeErr</span> error code = <span class="code">0x02</span></p>
+        <p><span class="code">typeErr</span> error code = <span class="code">0x03</span></p>
         <div class="description">
             <p>Thrown if a value or resource has the wrong type. This includes the following circumstances:</p>
             <ul>
@@ -175,14 +175,14 @@ pre.code {
                 <li>An instruction argument is not constant when a constant value is expected</li>
             </ul>
         </div>
-        <p><span class="code">numRangeErr</span> error code = <span class="code">0x03</span></p>
+        <p><span class="code">numRangeErr</span> error code = <span class="code">0x04</span></p>
         <div class="description">
             <p>Thrown if a number argument is not in an acceptable range. This includes the following circumstances:</p>
             <ul>
                 <li>An argument representing a length, size, or number of elements is negative (unless a negative value holds special significance in the context of the instruction)</li>
             </ul>
         </div>
-        <p><span class="code">indexErr</span> error code = <span class="code">0x04</span></p>
+        <p><span class="code">indexErr</span> error code = <span class="code">0x05</span></p>
         <div class="description">
             <p>Thrown if an index argument is out of bounds or refers to an invalid item. This includes the following circumstances:</p>
             <ul>
@@ -192,15 +192,15 @@ pre.code {
                 <li>An index a function table is out of bounds</li>
             </ul>
         </div>
-        <p><span class="code">ptrErr</span> error code = <span class="code">0x05</span></p>
+        <p><span class="code">ptrErr</span> error code = <span class="code">0x06</span></p>
         <div class="description">
             <p>Thrown if a pointer argument has a malformed value, or if the pointer references a deleted heap allocation.</p>
         </div>
-        <p><span class="code">nullErr</span> error code = <span class="code">0x06</span></p>
+        <p><span class="code">nullErr</span> error code = <span class="code">0x07</span></p>
         <div class="description">
             <p>Thrown if a pointer argument has an unexpected null value.</p>
         </div>
-        <p><span class="code">dataErr</span> error code = <span class="code">0x07</span></p>
+        <p><span class="code">dataErr</span> error code = <span class="code">0x08</span></p>
         <div class="description">
             <p>Thrown if an argument data structure contains malformed data. This includes the following circumstances:</p>
             <ul>
@@ -208,18 +208,18 @@ pre.code {
                 <li>A region size parameter in a bytecode application file has an unexpected value</li>
             </ul>
         </div>
-        <p><span class="code">argFrameErr</span> error code = <span class="code">0x08</span></p>
+        <p><span class="code">argFrameErr</span> error code = <span class="code">0x09</span></p>
         <div class="description">
             <p>Thrown when invoking a function if the next argument frame has invalid size.</p>
         </div>
-        <p><span class="code">missingErr</span> error code = <span class="code">0x09</span></p>
+        <p><span class="code">missingErr</span> error code = <span class="code">0x0A</span></p>
         <div class="description">
             <p>Thrown if a necessary resource does not exist. This includes the following circumstances:</p>
             <ul>
                 <li>A file required for an operation does not exist</li>
             </ul>
         </div>
-        <p><span class="code">stateErr</span> error code = <span class="code">0x0A</span></p>
+        <p><span class="code">stateErr</span> error code = <span class="code">0x0B</span></p>
         <div class="description">
             <p>Thrown when trying to use a resource which is in an invalid state. This includes the following circumstances:</p>
             <ul>
@@ -227,7 +227,7 @@ pre.code {
                 <li>An application required for an operation is not running</li>
             </ul>
         </div>
-        <p><span class="code">permErr</span> error code = <span class="code">0x0B</span></p>
+        <p><span class="code">permErr</span> error code = <span class="code">0x0C</span></p>
         <div class="description">
             <p>Thrown if the current application has insufficient permissions to perform an action. This includes the following circumstances:</p>
             <ul>
@@ -238,14 +238,14 @@ pre.code {
                 <li>An application without admin permission tries to kill another application</li>
             </ul>
         </div>
-        <p><span class="code">capacityErr</span> error code = <span class="code">0x0C</span></p>
+        <p><span class="code">capacityErr</span> error code = <span class="code">0x0D</span></p>
         <div class="description">
             <p>Thrown if the system has insufficient hardware resources for the operation. This includes the following circumstances:</p>
             <ul>
                 <li>An application tries to create a file when the system volume is full</li>
             </ul>
         </div>
-        <p><span class="code">throttleErr</span> error code = <span class="code">0x0D</span></p>
+        <p><span class="code">throttleErr</span> error code = <span class="code">0x0E</span></p>
         <div class="description">
             <p>Thrown if the current application should terminate prematurely. This includes the following circumstances:</p>
             <ul>
