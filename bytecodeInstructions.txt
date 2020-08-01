@@ -220,7 +220,7 @@ $ appIsRunning = 0x73
 > appHandle = Application file handle (pointer)
 
 $ appInitErr = 0x74
-# Retrieves the code of the unhandled error which terminated the `init` function of the given application. The result will be 0 if the given application has no associated `init` error. The `init` error will persist until `appHandle` is recycled by the system, or until the application is launched again.
+# Retrieves the code of the unhandled error which terminated the `init` function of the given application. The result will be 0 if the given application has no associated `init` error. The `init` error will persist until `appHandle` is deleted by the system, or until the application is launched again.
 > dest = Destination for the result (number)
 > appHandle = Application file handle (pointer)
 
@@ -268,12 +268,12 @@ $ fileSize = 0x86
 ! FILE HANDLE INSTRUCTIONS
 
 $ openFile = 0x90
-# Retrieves a file handle for the given file.
+# Retrieves a file handle for the given file. After the current application finishes using the file handle, the application should perform the `closeFile` instruction. Otherwise, the system may accumulate garbage.
 > dest = Destination for the file handle (pointer)
 > name = File name (pointer)
 
 $ closeFile = 0x91
-# Indicates to the system that the current application has finished using the given file handle.
+# Indicates to the system that the current application has finished using the given file handle. The system may delete `fileHandle` if all other applications have also closed the file handle.
 > fileHandle = File handle (pointer)
 
 $ fileName = 0x92
