@@ -230,58 +230,27 @@ $ killApp = 0x75
 
 ! FILE INSTRUCTIONS
 
-$ allFileNames = 0x80
-# Retrieves a list of all file names in the system volume.
-> dest = Destination for the list of file names (pointer)
-
-$ newFile = 0x81
+$ newFile = 0x80
 # Creates a new file.
 > name = Name of the new file (pointer)
 > type = Type of the new file (number)
 > isGuarded = Whether the new file should be guarded (number)
 > size = Size of the new file (number)
 
-$ delFile = 0x82
+$ delFile = 0x81
 # Deletes the given file.
-> name = File name (pointer)
+> fileHandle = File handle (pointer)
 
-$ fileExists = 0x83
-# Retrieves whether a file with the given name exists.
-> dest = Destination for the result (number)
-> name = File name (pointer)
-
-$ fileType = 0x84
-# Retrieves the type of the given file.
-> dest = Destination for the file type (number)
-> name = File name (pointer)
-
-$ fileIsGuarded = 0x85
-# Retrieves whether the given file is guarded.
-> dest = Destination for the result (number)
-> name = File name (pointer)
-
-$ fileSize = 0x86
-# Retrieves the size of the given file.
-> dest = Destination for the file size (number)
-> name = File name (pointer)
-
-! FILE HANDLE INSTRUCTIONS
-
-$ openFile = 0x90
+$ openFile = 0x82
 # Retrieves a file handle for the given file. After the current application finishes using the file handle, the application should perform the `closeFile` instruction. Otherwise, the system may accumulate garbage.
 > dest = Destination for the file handle (pointer)
 > name = File name (pointer)
 
-$ closeFile = 0x91
+$ closeFile = 0x83
 # Indicates to the system that the current application has finished using the given file handle. The system may delete `fileHandle` if all other applications have also closed the file handle.
 > fileHandle = File handle (pointer)
 
-$ fileName = 0x92
-# Retrieves the name of the given file.
-> dest = Destination for the file name (pointer)
-> fileHandle = File handle (pointer)
-
-$ readFile = 0x93
+$ readFile = 0x84
 # Reads a sequences of bytes from the given file into a buffer.
 > dest = Destination for file data (number)
 > fileHandle = File handle (pointer)
@@ -290,7 +259,7 @@ $ readFile = 0x93
 * Throws `indexErr` if `pos` is outside file bounds.
 * Throws `numRangeErr` if `size` reaches outside file or allocation bounds.
 
-$ wrtFile = 0x94
+$ wrtFile = 0x85
 # Writes a sequences of bytes from the given buffer into a file.
 > fileHandle = File handle (pointer)
 > pos = File position (number)
@@ -298,6 +267,37 @@ $ wrtFile = 0x94
 > size = Number of bytes to write (number)
 * Throws `indexErr` if `pos` is outside file bounds.
 * Throws `numRangeErr` if `size` reaches outside file or allocation bounds.
+
+! FILE METADATA INSTRUCTIONS
+
+$ allFileNames = 0x90
+# Retrieves a list of all file names in the system volume.
+> dest = Destination for the list of file names (pointer)
+
+$ fileExists = 0x91
+# Retrieves whether a file with the given name exists.
+> dest = Destination for the result (number)
+> name = File name (pointer)
+
+$ fileName = 0x92
+# Retrieves the name of the given file.
+> dest = Destination for the file name (pointer)
+> fileHandle = File handle (pointer)
+
+$ fileType = 0x93
+# Retrieves the type of the given file.
+> dest = Destination for the file type (number)
+> fileHandle = File handle (pointer)
+
+$ fileIsGuarded = 0x94
+# Retrieves whether the given file is guarded.
+> dest = Destination for the result (number)
+> fileHandle = File handle (pointer)
+
+$ fileSize = 0x95
+# Retrieves the size of the given file.
+> dest = Destination for the file size (number)
+> fileHandle = File handle (pointer)
 
 ! PERMISSION INSTRUCTIONS
 
