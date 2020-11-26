@@ -81,6 +81,7 @@ pre.code {
     Instruction array,
     Application data
 ]</pre>
+        <p>Instruction bodies inside the instruction array must match the order of entries in the function table. Instruction bodies may not have unused space before or after their defined boundaries.</p>
         <p>File types:</p>
         <ul>
             <li><span class="code">0</span> = Generic file</li>
@@ -189,7 +190,7 @@ pre.code {
                 <li>An index in a frame is out of bounds</li>
                 <li>An index in the app data region is out of bounds</li>
                 <li>An index in a heap allocation is out of bounds</li>
-                <li>An index a function table is out of bounds</li>
+                <li>An index in a function table is out of bounds</li>
             </ul>
         </div>
         <p><span class="code">ptrErr</span> error code = <span class="code">0x06</span></p>
@@ -210,7 +211,7 @@ pre.code {
         </div>
         <p><span class="code">argFrameErr</span> error code = <span class="code">0x09</span></p>
         <div class="description">
-            <p>Thrown when invoking a function if the next argument frame has invalid size.</p>
+            <p>Thrown when invoking a function if the next argument frame has invalid size or is missing.</p>
         </div>
         <p><span class="code">missingErr</span> error code = <span class="code">0x0A</span></p>
         <div class="description">
