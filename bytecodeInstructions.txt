@@ -20,19 +20,24 @@ $ newArgFrame = 0x02
 $ newAlloc = 0x03
 # Creates a new heap allocation.
 > dest = Destination for the new heap allocation (pointer)
-> isGuarded = Whether the new heap allocation should be guarded (number)
+> attrs = Attributes of the new heap allocation (number)
 > size = Size of the new heap allocation (number)
 
 $ delAlloc = 0x04
 # Deletes a heap allocation.
 > alloc = Heap allocation (pointer)
 
-$ allocSize = 0x05
+$ allocAttrs = 0x05
+# Retrieves the attributes of a heap allocation.
+> dest = Destination for the attributes (number)
+> alloc = Heap allocation (pointer)
+
+$ allocSize = 0x06
 # Retrieves the size of a heap allocation.
 > dest = Destination for the size (number)
 > alloc = Heap allocation (pointer)
 
-$ allocCreator = 0x06
+$ allocCreator = 0x07
 # Retrieves the file handle of the application which created the given heap allocation. The result is null if the allocation was created by the system.
 > dest = Destination for the result (pointer)
 > alloc = Heap allocation (pointer)

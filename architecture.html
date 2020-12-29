@@ -146,6 +146,7 @@ pre.code {
             <p>Causes the calling application to become an observer of the receiving terminal driver. When the terminal driver registers a typed key, it will invoke the <span class="code">termInput</span> function of its observer. Each terminal driver may have at most one observer. If another application invokes <span class="code">listenTerm</span>, it will become the new observer.</p>
             <ul>
                 <li><span class="code">listenTerm</span> function ID = 3</li>
+                <li>Throws <span class="code">missingErr</span> if the calling application does not implement <span class="code">termInput</span>.</li>
             </ul>
         </div>
         <pre class="code">termSize(
