@@ -74,7 +74,7 @@ pre.code {
             <li>The permission system does not support granularity beyond admin permission.</li>
         </ul>
         <p class="title2">FILE SYSTEM</p>
-        <p>The system maintains a single volume for non-volatile storage of files. The volume may store any number of uniquely named files at the top level. The system does not support directories or any kind of nested file structure.</p>
+        <p>The system maintains a single volume for non-volatile storage of files. The volume may store any number of uniquely named files at the top level. The system does not support directories or any kind of nested file structure. Each file name may be no longer than 127 characters.</p>
         <p>Upon start-up, the system will launch an application named <span class="code">boot</span> in the system volume. If no such application is found, the system will become inactive.</p>
         <p>Every file has one of the following types:</p>
         <ul>
@@ -187,6 +187,7 @@ pre.code {
             <p>Terminal key codes for visible characters have ASCII values. Other key codes include the following:</p>
             <ul>
                 <li>Space = 32</li>
+                <li>Tab = 9</li>
                 <li>Newline = 10</li>
                 <li>Backspace = 127</li>
                 <li>Escape = 27</li>
@@ -194,6 +195,8 @@ pre.code {
                 <li>Right = -2</li>
                 <li>Up = -3</li>
                 <li>Down = -4</li>
+                <li>Reverse tab = -5</li>
+                <li>System menu = -6</li>
             </ul>
         </div>
         <p class="title2">SERIAL DRIVER FUNCTIONS</p>

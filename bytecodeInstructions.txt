@@ -241,6 +241,7 @@ $ newFile = 0x80
 > type = Type of the new file (number)
 > isGuarded = Whether the new file should be guarded (number)
 > size = Size of the new file (number)
+* Throws `dataErr` if `name` is longer than 127 characters.
 
 $ delFile = 0x81
 # Deletes the given file.
@@ -325,15 +326,20 @@ $ memSize = 0xB0
 # Retrieves the total amount of memory in the system.
 > dest = Destination for the amount (number)
 
-$ memSizeLeft = 0xB1
+$ appMemSize = 0xB1
+# Retrieves the amount of memory used by the given application.
+> dest = Destination for the amount (number)
+> appHandle = Application file handle (pointer)
+
+$ memSizeLeft = 0xB2
 # Retrieves the amount of unused memory remaining in the system.
 > dest = Destination for the amount (number)
 
-$ volSize = 0xB2
+$ volSize = 0xB3
 # Retrieves the total amount of storage in the system volume.
 > dest = Destination for the amount (number)
 
-$ volSizeLeft = 0xB3
+$ volSizeLeft = 0xB4
 # Retrieves the amount of unused storage remaining in the system volume.
 > dest = Destination for the amount (number)
 
