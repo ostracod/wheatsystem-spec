@@ -42,6 +42,11 @@ $ allocCreator = 0x07
 > dest = Destination for the result (pointer)
 > alloc = Heap allocation (pointer)
 
+$ setAllocAttrs = 0x08
+# Modifies the attributes of the given heap allocation.
+> alloc = Heap allocation (pointer)
+> attrs = Allocation attributes (number)
+
 ! CONTROL FLOW INSTRUCTIONS
 
 $ jmp = 0x10
@@ -232,6 +237,7 @@ $ appInitErr = 0x74
 $ killApp = 0x75
 # Requests for the given application to terminate.
 > appHandle = Application file handle (pointer)
+* Throws `permErr` if the invoking application does not hold admin permission.
 
 ! FILE INSTRUCTIONS
 

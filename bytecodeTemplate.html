@@ -94,22 +94,23 @@ pre.code {
     u1 is guarded
 ]</pre>
         <p class="title2">MEMORY LAYOUT</p>
-        <p>Every application has its own stack containing one or more frames. The size of a frame remains fixed after it is allocated.</p>
+        <p>A "frame" is used by an application to store variable data. The size of each frame remains fixed after it is allocated.</p>
         <p>Each frame has one of three types:</p>
         <ul>
-            <li>The "global frame" is available at all times after launch.</li>
+            <li>The "global frame" is available at all times after the application launches.</li>
             <li>A "local frame" is available to the current function invocation.</li>
             <li>An "argument frame" is available to both the invoking function and invoked function.</li>
         </ul>
-        <p>After the stack is initialized, it contains a single global frame. This frame is never removed.</p>
-        <p>To invoke a function, the calling function must perform the following steps:</p>
+        <p>Each application has exactly one global frame. This frame is never removed.</p>
+        <p>One or more threads may be active in the system at a time. Each thread contains a stack, which in turn contains local frames and argument frames. When a thread calls a function, a local frame is added to the stack. When a thread returns from a function, the corresponding local frame is removed from the stack.</p>
+        <p>Argument values and return values are passed between functions through argument frames. If one function would like to call a function with arguments and read the return value, the calling function must perform these steps:</p>
         <ol>
             <li>Allocate an argument frame.</li>
             <li>Populate the argument frame with arguments.</li>
             <li>Call the function and wait for invocation to finish.</li>
             <li>Read return values from the argument frame.</li>
         </ol>
-        <p>An invoked function follows the steps below:</p>
+        <p>In the scenario described above, the invoked function would follow these steps:</p>
         <ol>
             <li>Read arguments from the argument frame provided by the calling function.</li>
             <li>Perform the desired set of operations.</li>
@@ -231,6 +232,7 @@ pre.code {
             <p>Thrown when trying to use a resource which is in an invalid state. This includes the following circumstances:</p>
             <ul>
                 <li>An application required for an operation is not running</li>
+                <li>An application required for an operation is being throttled</li>
             </ul>
         </div>
         <p><span class="code">permErr</span> error code = <span class="code">0x0C</span></p>
@@ -241,19 +243,19 @@ pre.code {
                 <li>An application without admin permission tries to invoke a guarded function of another application</li>
                 <li>An application without admin permission tries to access a guarded file</li>
                 <li>An application without admin permission tries to give or remove admin permission</li>
-                <li>An application without admin permission tries to kill another application</li>
             </ul>
         </div>
         <p><span class="code">capacityErr</span> error code = <span class="code">0x0D</span></p>
         <div class="description">
             <p>Thrown if the system has insufficient hardware resources for the operation. This includes the following circumstances:</p>
             <ul>
+                <li>An application tries to create a memory allocation when memory is full</li>
                 <li>An application tries to create a file when the system volume is full</li>
             </ul>
         </div>
         <p><span class="code">throttleErr</span> error code = <span class="code">0x0E</span></p>
         <div class="description">
-            <p>Thrown if the current application should terminate prematurely. This includes the following circumstances:</p>
+            <p>Thrown if the current function invocation should terminate prematurely. This includes the following circumstances:</p>
             <ul>
                 <li>An application tries to kill another application</li>
                 <li>The system tries to kill an application to free memory</li>

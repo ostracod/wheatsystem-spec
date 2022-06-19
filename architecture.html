@@ -75,7 +75,8 @@ pre.code {
         </ul>
         <p class="title2">FILE SYSTEM</p>
         <p>The system maintains a single volume for non-volatile storage of files. The volume may store any number of uniquely named files at the top level. The system does not support directories or any kind of nested file structure. Each file name may be no longer than 127 characters.</p>
-        <p>Upon start-up, the system will launch an application named <span class="code">boot</span> in the system volume. If no such application is found, the system will become inactive.</p>
+        <p>If a file name begins with the prefix <span class="code">ws</span>, the file is defined as part of the WheatSystem specification. This convention helps avoid name collisions with third-party files.</p>
+        <p>Upon start-up, the system will launch an application named <span class="code">wsBoot</span> in the system volume. If no such application is found, the system will become inactive.</p>
         <p>Every file has one of the following types:</p>
         <ul>
             <li>Generic file</li>
@@ -111,18 +112,19 @@ pre.code {
         <p>An application which holds admin permission may give or remove admin permission to any other application. Ownership of admin permission is persisted in non-volatile storage.</li>
         <p class="title2">RESOURCE SYSTEM</p>
         <p>The resource system distributes hardware resources to applications, including memory  and non-volatile storage.</p>
-        <p>If system memory becomes full, the system will attempt to kill a running application to free memory. The system will attempt the following actions to kill an application, ordered from most favorable to least favorable:</p>
+        <p>If memory usage becomes high, the system will attempt to kill a running application to free memory. The system will attempt the following actions to kill an application, ordered from most favorable to least favorable:</p>
         <ol>
             <li>If the application implements a <span class="code">kill</span> function, call the <span class="code">kill</span> function.</li>
-            <li>Throw <span class="code">throttleErr</span> in the application.</li>
-            <li>Terminate the child in a dirty state.</li>
+            <li>Throw <span class="code">throttleErr</span> in threads which contain function invocations of the application.</li>
+            <li>Terminate the application in a dirty state.</li>
         </ol>
         <p>When throttling applications to free memory, the system will favor the following applications:</p>
         <ul>
             <li>Applications which do not hold admin permission</li>
             <li>Applications which are using a lot of memory</li>
         </ul>
-        <p>If an application attempts to create a file when the system volume is full, the resource system will throw <span class="code">capacityErr</span>. The application will not be able to create more files until volume space is freed.</p>
+        <p>If an application attempts to create a memory allocation when memory is full, the resource system will throw <span class="code">capacityErr</span>. The application will not be able to create more memory allocations until memory is freed.</p>
+        <p>In an analagous fashion, the resource system will throw <span class="code">capacityErr</span> when the system volume is full and an application tries to create a file. The application will not be able to create more files until volume space is freed.</p>
         <p class="title2">APPLICATION FUNCTIONS</p>
         <p>Any WheatSystem application may implement the functions <span class="code">init</span> and <span class="code">kill</span>. These functions help the system manage the lifecycle of applications.</p>
         <pre class="code">init()</pre>
@@ -140,7 +142,7 @@ pre.code {
             </ul>
         </div>
         <p class="title2">TERMINAL DRIVER FUNCTIONS</p>
-        <p>A terminal driver implements the functions <span class="code">listenTerm</span>, <span class="code">termSize</span>, and <span class="code">wrtTerm</span>. The standard system terminal driver is optional for WheatSystem distributions. If available, the standard system terminal driver has the file name <span class="code">term</span>.</p>
+        <p>A terminal driver implements the functions <span class="code">listenTerm</span>, <span class="code">termSize</span>, and <span class="code">wrtTerm</span>. The standard system terminal driver is optional for WheatSystem distributions. If available, the standard system terminal driver has the file name <span class="code">wsTerm</span>.</p>
         <pre class="code">listenTerm()</pre>
         <div class="description">
             <p>Causes the calling application to become an observer of the receiving terminal driver. When the terminal driver registers a typed key, it will invoke the <span class="code">termInput</span> function of its observer. Each terminal driver may have at most one observer. If another application invokes <span class="code">listenTerm</span>, it will become the new observer.</p>
@@ -200,7 +202,7 @@ pre.code {
             </ul>
         </div>
         <p class="title2">SERIAL DRIVER FUNCTIONS</p>
-        <p>A serial driver implements the functions <span class="code">startSerial</span>, <span class="code">stopSerial</span>, and <span class="code">wrtSerial</span>. The standard system serial driver is optional for WheatSystem distributions. If available, the standard system serial driver has the file name <span class="code">serial</span>.</p>
+        <p>A serial driver implements the functions <span class="code">startSerial</span>, <span class="code">stopSerial</span>, and <span class="code">wrtSerial</span>. The standard system serial driver is optional for WheatSystem distributions. If available, the standard system serial driver has the file name <span class="code">wsSerial</span>.</p>
         <pre class="code">startSerial(
     s8 port,
     s32 baudRate
@@ -248,7 +250,7 @@ pre.code {
             </ul>
         </div>
         <p class="title2">GPIO DRIVER FUNCTIONS</p>
-        <p>A GPIO driver implements the functions <span class="code">setGpioMode</span>, <span class="code">readGpio</span>, and <span class="code">wrtGpio</span>. The standard system GPIO driver is optional for WheatSystem distributions. If available, the standard system GPIO driver has the file name <span class="code">gpio</span>.</p>
+        <p>A GPIO driver implements the functions <span class="code">setGpioMode</span>, <span class="code">readGpio</span>, and <span class="code">wrtGpio</span>. The standard system GPIO driver is optional for WheatSystem distributions. If available, the standard system GPIO driver has the file name <span class="code">wsGpio</span>.</p>
         <pre class="code">setGpioMode(
     s32 pin,
     s8 mode
@@ -297,6 +299,7 @@ pre.code {
         <p><span class="code">arg</span> = Argument</p>
         <p><span class="code">alloc</span> = Allocation</p>
         <p><span class="code">app</span> = Application</p>
+        <p><span class="code">attr</span> = Attribute</p>
         <p><span class="code">buff</span> = Buffer</p>
         <p><span class="code">clr</span> = Clear</p>
         <p><span class="code">cond</span> = Condition</p>
