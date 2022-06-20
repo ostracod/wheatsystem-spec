@@ -1,0 +1,12 @@
+{
+    "name": "wheatsystem-spec",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "postinstall": "tsc"
+    },
+    "dependencies": {},
+    "devDependencies": {}
+}

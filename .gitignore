@@ -1,5 +1,7 @@
 
 bytecode.html
 bytecodeInstructions.json
+node_modules
+dist
 
 
