@@ -19,8 +19,8 @@ This project has the following system-wide dependencies:
 
 To generate the documentation:
 
-1. Compile TypeScript code: `tsc`
-2. Run the generation script: `node ./dist/generate.js`
+1. Compile TypeScript code: `npm run build`
+1. Run the generation script: `node ./dist/generate.js`
 
 To use this repository as a dependency, add the following line to `dependencies` in your `package.json` file, replacing `(version)` with the desired version number:
 
