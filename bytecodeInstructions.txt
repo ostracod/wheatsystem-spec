@@ -7,14 +7,14 @@ $ wrt = 0x00
 > value = Value to write (number or pointer)
 
 $ wrtBuff = 0x01
-# Copies a sequence of bytes between memory locations.
+# Copies a sequence of bytes between memory locations. `dest` and `buff` may overlap each other in memory.
 > dest = Start of the destination buffer (number or pointer)
 > buff = Start of the source buffer (number or pointer)
 > size = Number of bytes in the buffer (number)
 * Throws `numRangeErr` if `size` reaches outside allocation bounds.
 
 $ newArgFrame = 0x02
-# Creates a new argument frame to feed into the next function invocation.
+# Creates a new argument frame to feed into the next function invocation. If an argument frame already exists, it will be deleted first.
 > size = Size of the new argument frame (number)
 
 $ newAlloc = 0x03
