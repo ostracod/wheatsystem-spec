@@ -67,10 +67,10 @@ $ jmpNZ = 0x12
 * Throws `indexErr` if `instrOffset` is outside instruction body bounds.
 
 $ wait = 0x13
-# Blocks execution until another function invocation performs the `resume` instruction.
+# Blocks execution of the current function invocation, unless the `wait` instruction has been excused from blocking. Will stop blocking if the current app calls the `resume` instruction in another thread.
 
 $ resume = 0x14
-# Causes all function invocations blocked by the `wait` instruction to continue execution.
+# Causes all function invocations belonging to the current app to become unblocked. If no function invocations are blocked, then the next `wait` instruction is excused from blocking.
 
 ! ERROR INSTRUCTIONS
 
