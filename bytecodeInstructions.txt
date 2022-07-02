@@ -11,7 +11,7 @@ $ wrtBuff = 0x01
 > dest = Start of the destination buffer (number or pointer)
 > buff = Start of the source buffer (number or pointer)
 > size = Number of bytes in the buffer (number)
-* Throws `numRangeErr` if `size` reaches outside allocation bounds.
+* Throws `lenErr` if `size` reaches outside allocation bounds.
 
 $ newArgFrame = 0x02
 # Creates a new argument frame to feed into the next function invocation. If an argument frame already exists, it will be deleted first.
@@ -247,7 +247,7 @@ $ newFile = 0x80
 > type = Type of the new file (number)
 > isGuarded = Whether the new file should be guarded (number)
 > size = Size of the new file (number)
-* Throws `dataErr` if `name` is longer than 127 characters.
+* Throws `dataErr` if `name` is longer than 127 characters, or if a file with name `name` already exists.
 
 $ delFile = 0x81
 # Deletes the given file.
@@ -269,7 +269,7 @@ $ readFile = 0x84
 > pos = File position (number)
 > size = Number of bytes to read (number)
 * Throws `indexErr` if `pos` is outside file bounds.
-* Throws `numRangeErr` if `size` reaches outside file or allocation bounds.
+* Throws `lenErr` if `size` reaches outside file or allocation bounds.
 
 $ wrtFile = 0x85
 # Writes a sequences of bytes from the given buffer into a file.
@@ -278,7 +278,7 @@ $ wrtFile = 0x85
 > buff = Data buffer (number)
 > size = Number of bytes to write (number)
 * Throws `indexErr` if `pos` is outside file bounds.
-* Throws `numRangeErr` if `size` reaches outside file or allocation bounds.
+* Throws `lenErr` if `size` reaches outside file or allocation bounds.
 
 ! FILE METADATA INSTRUCTIONS
 

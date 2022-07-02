@@ -92,11 +92,11 @@ pre.code {
         <p>Every application uses the same unified heap for dynamic memory allocation. Applications must manage garbage collection of their heap allocations. If an application quits, the system will delete every heap allocation created by the application.</p>
         <p>Whenever an application uses a pointer, the bytecode runtime environment will verify that the pointer value is not malformed. This check ensures that the application does not access an invalid memory location.</p>
         <p>Furthermore, heap allocation read and write operations are controlled by the permission system. If an application without admin permission tries to access a guarded heap allocation of another application, the system will throw an error.</p>
-        <p>Every application has a function table which defines all functions available in the application. Each function has a signed 32-bit integer ID to help preserve compatibility regardless of function table ordering. The sign of each function ID hold special significance:</p>
+        <p>Every application has a function table which defines all functions available in the application. Each function has a signed 32-bit integer ID to help preserve compatibility regardless of function table ordering. The sign of each function ID holds special significance:</p>
         <ul>
-            <li>If function ID is zero, the function is not intended to be used externally.</li>
-            <li>If function ID is positive, the function is defined as part of the WheatSystem specification.</li>
-            <li>If function ID is negative, the function is defined as part of some third-party specification.</li>
+            <li>If a function ID is zero, the function is not intended to be used externally.</li>
+            <li>If a function ID is positive, the function is defined as part of the WheatSystem specification.</li>
+            <li>If a function ID is negative, the function is defined as part of some third-party specification.</li>
         </ul>
         <p>Lists of WheatSystem function IDs are available in later sections of this document.</p>
         <p class="title2">PERMISSION SYSTEM</p>
