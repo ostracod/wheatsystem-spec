@@ -114,6 +114,12 @@ $ caller = 0x34
 # Retrieves the file handle of the application which invoked the current function.
 > dest = Destination for the application file handle (pointer)
 
+$ funcIsGuarded = 0x35
+# Retrieves whether the function defined in the given application is guarded.
+> dest = Destination for the result (number)
+> appHandle = Application file handle (pointer)
+> funcIndex = Index of a function in the function table (number)
+
 ! BITWISE INSTRUCTIONS
 
 $ bNot = 0x40

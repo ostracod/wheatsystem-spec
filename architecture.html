@@ -119,10 +119,10 @@ pre.code {
             <li>Terminate the application in a dirty state.</li>
         </ol>
         <p>When throttling applications to free memory, the system will favor the following applications:</p>
-        <ul>
+        <ol>
             <li>Applications which do not hold admin permission</li>
             <li>Applications which are using a lot of memory</li>
-        </ul>
+        </ol>
         <p>If an application attempts to create a memory allocation when memory is full, the resource system will throw <span class="code">capacityErr</span>. The application will not be able to create more memory allocations until memory is freed.</p>
         <p>In an analagous fashion, the resource system will throw <span class="code">capacityErr</span> when the system volume is full and an application tries to create a file. The application will not be able to create more files until volume space is freed.</p>
         <p class="title2">APPLICATION FUNCTIONS</p>
