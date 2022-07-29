@@ -2,7 +2,7 @@
 import * as fs from "fs";
 import * as pathUtils from "path";
 import { templateFilePath, instructionsFilePath } from "./constants.js";
-import { Category, Instruction, Argument } from "./instructionClasses.js";
+import { SpecLine, DefinitionLine, MemberLine, TitleLine, DescriptionLine, BulletLine } from "./specLine.js";
 
 export const readTemplateText = (): string => (
     fs.readFileSync(templateFilePath, "utf8")
@@ -12,43 +12,61 @@ export const readInstructionsText = (): string => (
     fs.readFileSync(instructionsFilePath, "utf8")
 );
 
-export const splitEqualityStatement = (statement: string): string[] => {
-    const textList = statement.split("=");
-    return textList.map((text) => text.trim());
+export const splitEqualityStatement = (statement: string): [string, string | null] => {
+    const index = statement.indexOf("=");
+    if (index < 0) {
+        return [statement, null];
+    } else {
+        return [
+            statement.substring(0, index).trim(),
+            statement.substring(index + 1, statement.length).trim(),
+        ];
+    }
 };
 
-export const parseInstructions = (instructionsText: string): Category[] => {
-    const output: Category[] = [];
-    let currentCategory = null;
-    let currentInstruction = null;
-    const lines = instructionsText.split("\n");
+export const parseSpecLines = (specText: string): SpecLine[] => {
+    const output: SpecLine[] = [];
+    let definitionLine = null;
+    const lines = specText.split("\n");
     for (const line of lines) {
-        if (line.length <= 0) {
+        if (line.length < 2) {
             continue;
         }
         const character = line.charAt(0);
         const text = line.substring(2, line.length);
         if (character === "!") {
-            currentCategory = new Category(text);
-            output.push(currentCategory);
-        }
-        if (character === "$") {
-            let [name, opcodeText] = splitEqualityStatement(text);
-            opcodeText = opcodeText.substring(2, opcodeText.length);
-            const opcode = parseInt(opcodeText, 16);
-            currentInstruction = new Instruction(name, opcode);
-            currentCategory.instructions.push(currentInstruction);
-        }
-        if (character === "#") {
-            currentInstruction.description = text;
-        }
-        if (character === ">") {
-            const [name, description] = splitEqualityStatement(text);
-            const argument = new Argument(name, description);
-            currentInstruction.arguments.push(argument);
-        }
-        if (character === "*") {
-            currentInstruction.notes.push(text);
+            output.push(new TitleLine(text));
+        } else if (character === "#") {
+            output.push(new DescriptionLine(text));
+        } else if (character === "*") {
+            output.push(new BulletLine(text));
+        } else if (character === "$") {
+            const [name, idText] = splitEqualityStatement(text);
+            let id: number | null;
+            if (idText === null) {
+                id = null;
+            } else if (idText.startsWith("0x")) {
+                id = parseInt(idText.substring(2, idText.length), 16);
+            } else {
+                id = parseInt(idText, 10);
+            }
+            definitionLine = new DefinitionLine(name, id);
+            output.push(definitionLine);
+        } else if (character === ">") {
+            let type: string;
+            let statement: string;
+            if (text.startsWith("(")) {
+                const index = text.indexOf(")");
+                type = text.substring(1, index);
+                statement = text.substring(index + 1, text.length).trim();
+            } else {
+                type = null;
+                statement = text;
+            }
+            const [name, description] = splitEqualityStatement(statement);
+            const memberLine = new MemberLine(name, type, description);
+            definitionLine.memberLines.push(memberLine);
+            output.push(memberLine);
         }
     }
     return output;
@@ -92,16 +110,14 @@ export const formatHtmlStyle = (documentHtml: string): string => {
 export const generateDocumentationFiles = (directoryPath: string): string[] => {
     const templateText = readTemplateText();
     const instructionsText = readInstructionsText();
-    const categories = parseInstructions(instructionsText);
-    const instructionsHtml = categories.map((category) => category.toHtml()).join("\n");
+    const specLines = parseSpecLines(instructionsText);
+    console.log(specLines);
+    const instructionsHtml = "";
     let documentHtml = populateTemplatePlaceholders(templateText, instructionsHtml);
     documentHtml = formatHtmlStyle(documentHtml);
-    const instructionsJson = categories.map((category) => category.toJson());
     const documentHtmlPath = pathUtils.join(directoryPath, "bytecode.html");
-    const instructionsJsonPath = pathUtils.join(directoryPath, "bytecodeInstructions.json");
     fs.writeFileSync(documentHtmlPath, documentHtml);
-    fs.writeFileSync(instructionsJsonPath, JSON.stringify(instructionsJson));
-    return [documentHtmlPath, instructionsJsonPath];
+    return [documentHtmlPath];
 };
 
 

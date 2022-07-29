@@ -9,7 +9,7 @@ export const templateFilePath = pathUtils.join(
     projectDirectoryPath, "bytecodeTemplate.html",
 );
 export const instructionsFilePath = pathUtils.join(
-    projectDirectoryPath, "bytecodeInstructions.txt",
+    projectDirectoryPath, "instructions.txt",
 );
 
 
