@@ -1,0 +1,97 @@
+
+! APPLICATION FUNCTIONS
+
+# Any WheatSystem application may implement the functions `init` and `kill`. These functions help the system manage the lifecycle of applications.
+
+$ init = 1
+# Triggered by the application system immediately after an application launches. If an application does not implement `init`, the application will remain inactive after launch.
+
+$ kill = 2
+# Requests for the receiving application to terminate. The application should clean up any volatile resources.
+
+! TERMINAL DRIVER FUNCTIONS
+
+# A terminal driver implements the functions `listenTerm`, `termSize`, and `wrtTerm`. The standard system terminal driver is optional for WheatSystem distributions. If available, the standard system terminal driver has the file name `wsTerm`.
+
+$ listenTerm = 3
+# Causes the calling application to become an observer of the receiving terminal driver. When the terminal driver registers a typed key, it will invoke the `termInput` function of its observer. Each terminal driver may have at most one observer. If another application invokes `listenTerm`, it will become the new observer.
+* Throws `missingErr` if the calling application does not implement `termInput`.
+
+$ termSize = 4
+# Retrieves the dimensions of the terminal controlled by the receiving terminal driver. The dimensions are measured in number of characters.
+> (s32) widthDest = Destination for the width
+> (s32) heightDest = Destination for the height
+
+$ wrtTerm = 5 
+# Displays text on the terminal of the receiving terminal driver. Text will wrap around to the next line after it reaches the end of the screen.
+> (s32) x = Horizontal coordinate
+> (s32) y = Vertical coordinate
+> (s32) text = Pointer to text allocation
+
+$ termInput = 6
+# Invoked by a terminal driver to notify the receiving observer when a key has been typed.
+> (s8) key = Typed key code
+
+# Terminal key codes for visible characters have ASCII values. Other key codes include the following:
+* Space = 32
+* Tab = 9
+* Newline = 10
+* Backspace = 127
+* Escape = 27
+* Left = -1
+* Right = -2
+* Up = -3
+* Down = -4
+* Reverse tab = -5
+* System menu = -6
+
+! SERIAL DRIVER FUNCTIONS
+
+# A serial driver implements the functions `startSerial`, `stopSerial`, and `wrtSerial`. The standard system serial driver is optional for WheatSystem distributions. If available, the standard system serial driver has the file name `wsSerial`.
+
+$ startSerial = 7
+# Causes the receiving serial driver to open the given serial port, and assigns the calling application as an observer. When the port receives input data, the serial driver will will invoke the `serialInput` function on the port's observer.
+> (s8) port = Serial port number
+> (s32) baudRate = Serial port baud rate
+
+$ stopSerial = 8
+# Causes the receiving serial driver to close the given serial port. The port will no longer send or receive data.
+> (s8) port = Serial port number
+
+$ wrtSerial = 9
+# Causes the receiving serial driver to output data over the given serial port.
+> (s8) port = Serial port number
+> (s32) buff = Pointer to buffer allocation
+
+$ serialInput = 10
+# Invoked by a serial driver to notify the receiving observer when a serial byte has been ingested.
+> (s8) port = Serial port number
+> (s8) value = Received serial data
+
+! GPIO DRIVER FUNCTIONS
+
+# A GPIO driver implements the functions `setGpioMode`, `readGpio`, and `wrtGpio`. The standard system GPIO driver is optional for WheatSystem distributions. If available, the standard system GPIO driver has the file name `wsGpio`.
+
+$ setGpioMode = 11
+# Sets the I/O mode of the given GPIO pin.
+> (s32) pin = GPIO pin number
+> (s8) mode = I/O mode
+
+# Available I/O modes include the following:
+* Digital read = 0
+* Analog read = 1
+* Digital write = 2
+* Analog write = 3
+
+
+$ readGpio = 12
+# Reads a digital or analog value from the given GPIO pin.
+> (s32) dest = Destination for the value
+> (s32) pin = GPIO pin number
+
+$ wrtGpio = 13
+# Writes a digital or analog value to the given GPIO pin.
+> (s32) pin = GPIO pin number
+> (s32) value = Value to write
+
+
