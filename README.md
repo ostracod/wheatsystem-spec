@@ -12,6 +12,7 @@ This repository may also be used as a Node.js module to provide opcodes and argu
 * `definition`: Provides classes for error, instruction, and function definitions.
 * `member`: Provides classes for arguments of instructions and functions.
 * `dataType`: Provides classes to specify data types of arguments.
+* `lineConverter`: Provides classes to convert specification lines to HTML.
 
 ## Usage
 

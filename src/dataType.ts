@@ -6,8 +6,8 @@ export class DataType {
         this.isConstant = false;
     }
     
-    toFriendlyString() {
-        return "TODO: Convert type to friendly string.";
+    toFriendlyString(isPlural: boolean): string {
+        return "data " + (isPlural ? "buffers" : "buffer");
     }
 }
 
@@ -20,19 +20,42 @@ export class IntegerType extends DataType {
         this.isSigned = isSigned;
         this.bitAmount = bitAmount;
     }
+    
+    toFriendlyString(isPlural: boolean): string {
+        let text = isPlural ? "integers" : "integer";
+        if (this.bitAmount !== null) {
+            text = `${this.bitAmount}-bit ${text}`;
+        }
+        if (this.isSigned !== null) {
+            if (this.isSigned) {
+                text = "signed " + text;
+            } else {
+                text = "unsigned " + text;
+            }
+        }
+        return text;
+    }
 }
 
 export class PointerType extends IntegerType {
-    elementType: DataType;
+    elementType: DataType | null;
     
-    constructor(elementType: DataType) {
+    constructor(elementType: DataType | null) {
         super(true, 32);
         this.elementType = elementType;
+    }
+    
+    toFriendlyString(isPlural: boolean): string {
+        let text = isPlural ? "pointers" : "pointer";
+        if (this.elementType !== null) {
+            text +=  " to " + this.elementType.toFriendlyString(false);
+        }
+        return text;
     }
 }
 
 export class ArrayType extends DataType {
-    elementType: DataType;
+    elementType: DataType | null;
     length: number | null;
     
     constructor(elementType: DataType, length: number | null = null) {
@@ -40,14 +63,31 @@ export class ArrayType extends DataType {
         this.elementType = elementType;
         this.length = length;
     }
+    
+    toFriendlyString(isPlural: boolean): string {
+        let text = isPlural ? "arrays" : "array";
+        if (this.length !== null) {
+            text += " with length " + this.length;
+        }
+        if (this.elementType !== null) {
+            text += " of " + this.elementType.toFriendlyString(true);
+        }
+        return text;
+    }
 }
 
 export class FileHandleType extends DataType {
     
+    toFriendlyString(isPlural: boolean): string {
+        return "file " + (isPlural ? "handles" : "handle");
+    }
 }
 
 export class AppHandleType extends FileHandleType {
     
+    toFriendlyString(isPlural: boolean): string {
+        return "app " + (isPlural ? "handles" : "handle");
+    }
 }
 
 

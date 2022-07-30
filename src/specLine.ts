@@ -3,6 +3,10 @@ import { DataType } from "./dataType.js";
 
 export abstract class SpecLine {
     
+    isListItem(): boolean {
+        return false;
+    }
+    
     toHtml(): string {
         throw new Error("toHtml is not implemented for this class.");
     }
@@ -28,6 +32,10 @@ export class IdLine extends SpecLine {
         super();
         this.definitionLine = definitionLine;
     }
+    
+    isListItem(): boolean {
+        return true;
+    }
 }
 
 export class MemberLine extends SpecLine {
@@ -42,15 +50,19 @@ export class MemberLine extends SpecLine {
         this.description = description;
     }
     
+    isListItem(): boolean {
+        return true;
+    }
+    
     toHtml(): string {
         let text = `<span class="code">${this.name}</span>`;
         if (this.description !== null) {
             text += " = " + this.description
         }
         if (this.type !== null) {
-            text += ` (${this.type.toFriendlyString()})`;
+            text += ` (${this.type.toFriendlyString(false)})`;
         }
-        return `<p>${text}</p>`;
+        return `<li>${text}</li>`;
     }
 }
 
@@ -80,7 +92,11 @@ export class DescriptionLine extends TextLine {
 export class BulletLine extends TextLine {
     
     toHtml(): string {
-        return `<p>${this.text}</p>`;
+        return `<li>${this.text}</li>`;
+    }
+    
+    isListItem(): boolean {
+        return true;
     }
 }
 

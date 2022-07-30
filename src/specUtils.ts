@@ -6,6 +6,7 @@ import { SpecLine, DefinitionLine, IdLine, MemberLine, TitleLine, DescriptionLin
 import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandleType } from "./dataType.js";
 import { InstructionDefinition } from "./definition.js";
 import { InstructionArg } from "./member.js";
+import { LineConverter, InstructionLineConverter } from "./lineConverter.js";
 
 const typeCreatorMap: { [name: string]: () => DataType } = {
     any: () => new DataType(),
@@ -45,9 +46,9 @@ export const parseDataType = (text: string): DataType => {
     let index = terms.length - 1;
     const lastTerm = terms[index];
     const typeCreator = typeCreatorMap[lastTerm];
-    let dataType: DataType;
+    let dataType: DataType | null;
     if (typeof typeCreator === "undefined") {
-        dataType = new DataType();
+        dataType = null;
     } else {
         dataType = typeCreator();
         index -= 1;
@@ -159,29 +160,30 @@ export const createInstructionDefinitions = (
 
 export const createSpecHtml = (
     specLines: SpecLine[],
-    convertDefinitionLine: (definitionLine: DefinitionLine) => string,
-    convertIdLine: ((idLine: IdLine) => string) | null = null,
+    lineConverter: LineConverter
 ): string => {
-    return specLines.map((specLine) => {
-        if (specLine instanceof DefinitionLine) {
-            return convertDefinitionLine(specLine);
-        } else if (specLine instanceof IdLine) {
-            if (convertIdLine === null) {
-                throw new Error("Unexpected ID line.");
+    const paragraphs: (SpecLine | SpecLine[])[] = [];
+    let currentList: SpecLine[] = null;
+    specLines.forEach((specLine) => {
+        if (specLine.isListItem()) {
+            if (currentList === null) {
+                currentList = [];
+                paragraphs.push(currentList);
             }
-            return convertIdLine(specLine);
+            currentList.push(specLine);
         } else {
-            return specLine.toHtml();
+            paragraphs.push(specLine);
+            currentList = null;
+        }
+    });
+    return paragraphs.map((paragraph) => {
+        if (Array.isArray(paragraph)) {
+            const htmlList = paragraph.map((specLine) => lineConverter.convertLine(specLine));
+            return `<ul>\n${htmlList.join("\n")}\n</ul>`;
+        } else {
+            return lineConverter.convertLine(paragraph);
         }
     }).join("\n");
-};
-
-export const convertNumberToHexadecimal = (value: number, length = 2): string => {
-    let text = value.toString(16).toUpperCase();
-    while (text.length < length) {
-        text = "0" + text;
-    }
-    return "0x" + text;
 };
 
 export const populateTemplatePlaceholders = (
@@ -226,18 +228,7 @@ export const generateDocumentationFiles = (directoryPath: string): string[] => {
     const templateText = fs.readFileSync(templatePath, "utf8");
     const instructionsText = getSpecText("instructions");
     const specLines = parseSpecLines(instructionsText);
-    const instructionsHtml = createSpecHtml(
-        specLines,
-        (definitionLine) => {
-            const names = definitionLine.memberLines.map((memberLine) => memberLine.name);
-            return `<p><span class="code">${definitionLine.name} ${names.join(", ")}</span></p>`;
-        },
-        (idLine) => {
-            const { definitionLine } = idLine;
-            const opcodeText = convertNumberToHexadecimal(definitionLine.id);
-            return `<p><span class="code">${definitionLine.name}</span> opcode = <span class="code">${opcodeText}</span></p>`
-        },
-    );
+    const instructionsHtml = createSpecHtml(specLines, new InstructionLineConverter());
     let documentHtml = populateTemplatePlaceholders(templateText, {
         INSTRUCTIONS: instructionsHtml
     });
