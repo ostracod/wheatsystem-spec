@@ -5,6 +5,10 @@ export class DataType {
     constructor() {
         this.isConstant = false;
     }
+    
+    toFriendlyString() {
+        return "TODO: Convert type to friendly string.";
+    }
 }
 
 export class IntegerType extends DataType {

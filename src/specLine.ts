@@ -1,6 +1,11 @@
 
+import { DataType } from "./dataType.js";
+
 export abstract class SpecLine {
     
+    toHtml(): string {
+        throw new Error("toHtml is not implemented for this class.");
+    }
 }
 
 export class DefinitionLine extends SpecLine {
@@ -16,16 +21,36 @@ export class DefinitionLine extends SpecLine {
     }
 }
 
+export class IdLine extends SpecLine {
+    definitionLine: DefinitionLine;
+    
+    constructor(definitionLine: DefinitionLine) {
+        super();
+        this.definitionLine = definitionLine;
+    }
+}
+
 export class MemberLine extends SpecLine {
     name: string;
-    type: string | null;
+    type: DataType | null;
     description: string | null;
     
-    constructor(name: string, type: string | null, description: string | null) {
+    constructor(name: string, type: DataType | null, description: string | null) {
         super();
         this.name = name;
         this.type = type;
         this.description = description;
+    }
+    
+    toHtml(): string {
+        let text = `<span class="code">${this.name}</span>`;
+        if (this.description !== null) {
+            text += " = " + this.description
+        }
+        if (this.type !== null) {
+            text += ` (${this.type.toFriendlyString()})`;
+        }
+        return `<p>${text}</p>`;
     }
 }
 
@@ -40,14 +65,23 @@ export abstract class TextLine extends SpecLine {
 
 export class TitleLine extends TextLine {
     
+    toHtml(): string {
+        return `<p class="title2">${this.text}</p>`;
+    }
 }
 
 export class DescriptionLine extends TextLine {
     
+    toHtml(): string {
+        return `<p>${this.text}</p>`;
+    }
 }
 
 export class BulletLine extends TextLine {
     
+    toHtml(): string {
+        return `<p>${this.text}</p>`;
+    }
 }
 
 

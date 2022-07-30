@@ -2,7 +2,7 @@
 import * as fs from "fs";
 import * as pathUtils from "path";
 import { projectDirectoryPath } from "./constants.js";
-import { SpecLine, DefinitionLine, MemberLine, TitleLine, DescriptionLine, BulletLine } from "./specLine.js";
+import { SpecLine, DefinitionLine, IdLine, MemberLine, TitleLine, DescriptionLine, BulletLine } from "./specLine.js";
 import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandleType } from "./dataType.js";
 import { InstructionDefinition } from "./definition.js";
 import { InstructionArg } from "./member.js";
@@ -38,54 +38,6 @@ export const splitEqualityStatement = (statement: string): [string, string | nul
             statement.substring(index + 1, statement.length).trim(),
         ];
     }
-};
-
-export const parseSpecLines = (specText: string): SpecLine[] => {
-    const output: SpecLine[] = [];
-    let definitionLine = null;
-    const lines = specText.split("\n");
-    for (const line of lines) {
-        if (line.length < 2) {
-            continue;
-        }
-        const character = line.charAt(0);
-        const text = line.substring(2, line.length);
-        if (character === "!") {
-            output.push(new TitleLine(text));
-        } else if (character === "#") {
-            output.push(new DescriptionLine(text));
-        } else if (character === "*") {
-            output.push(new BulletLine(text));
-        } else if (character === "$") {
-            const [name, idText] = splitEqualityStatement(text);
-            let id: number | null;
-            if (idText === null) {
-                id = null;
-            } else if (idText.startsWith("0x")) {
-                id = parseInt(idText.substring(2, idText.length), 16);
-            } else {
-                id = parseInt(idText, 10);
-            }
-            definitionLine = new DefinitionLine(name, id);
-            output.push(definitionLine);
-        } else if (character === ">") {
-            let type: string;
-            let statement: string;
-            if (text.startsWith("(")) {
-                const index = text.indexOf(")");
-                type = text.substring(1, index);
-                statement = text.substring(index + 1, text.length).trim();
-            } else {
-                type = null;
-                statement = text;
-            }
-            const [name, description] = splitEqualityStatement(statement);
-            const memberLine = new MemberLine(name, type, description);
-            definitionLine.memberLines.push(memberLine);
-            output.push(memberLine);
-        }
-    }
-    return output;
 };
 
 export const parseDataType = (text: string): DataType => {
@@ -126,19 +78,72 @@ export const parseDataType = (text: string): DataType => {
     return dataType;
 };
 
+export const parseSpecLines = (specText: string): SpecLine[] => {
+    const output: SpecLine[] = [];
+    let definitionLine = null;
+    const lines = specText.split("\n");
+    for (const line of lines) {
+        if (line.length < 2) {
+            continue;
+        }
+        const character = line.charAt(0);
+        const text = line.substring(2, line.length);
+        if (character === "!") {
+            output.push(new TitleLine(text));
+        } else if (character === "#") {
+            output.push(new DescriptionLine(text));
+        } else if (character === "*") {
+            output.push(new BulletLine(text));
+        } else if (character === "@") {
+            output.push(new IdLine(definitionLine));
+        } else if (character === "$") {
+            const [name, idText] = splitEqualityStatement(text);
+            let id: number | null;
+            if (idText === null) {
+                id = null;
+            } else if (idText.startsWith("0x")) {
+                id = parseInt(idText.substring(2, idText.length), 16);
+            } else {
+                id = parseInt(idText, 10);
+            }
+            definitionLine = new DefinitionLine(name, id);
+            output.push(definitionLine);
+        } else if (character === ">") {
+            let type: DataType | null;
+            let statement: string;
+            if (text.startsWith("(")) {
+                const index = text.indexOf(")");
+                const typeText = text.substring(1, index);
+                type = parseDataType(typeText);
+                statement = text.substring(index + 1, text.length).trim();
+            } else {
+                type = null;
+                statement = text;
+            }
+            const [name, description] = splitEqualityStatement(statement);
+            const memberLine = new MemberLine(name, type, description);
+            definitionLine.memberLines.push(memberLine);
+            output.push(memberLine);
+        }
+    }
+    return output;
+};
+
 export const createInstructionDefinition = (
     definitionLine: DefinitionLine,
 ): InstructionDefinition => {
-    const definitionName = definitionLine.name;
+    const { name: definitionName, id } = definitionLine;
+    if (id === null) {
+        throw new Error(`"${definitionName}" instruction is missing opcode.`);
+    }
     const args = definitionLine.memberLines.map((memberLine) => {
-        const { name: argName, type: typeText } = memberLine;
-        if (typeText === null) {
+        const { name: argName, type } = memberLine;
+        if (type === null) {
             throw new Error(`"${argName}" argument of "${definitionName}" instruction is missing data type.`);
         }
-        const dataType = parseDataType(typeText);
-        return new InstructionArg(argName, dataType);
+        return new InstructionArg(argName, type);
     });
-    return new InstructionDefinition(definitionName, definitionLine.id, args);
+    return new InstructionDefinition(definitionName, id, args);
 }
 
 export const createInstructionDefinitions = (
@@ -151,6 +156,33 @@ export const createInstructionDefinitions = (
         (definitionLine) => createInstructionDefinition(definitionLine),
     );
 }
+
+export const createSpecHtml = (
+    specLines: SpecLine[],
+    convertDefinitionLine: (definitionLine: DefinitionLine) => string,
+    convertIdLine: ((idLine: IdLine) => string) | null = null,
+): string => {
+    return specLines.map((specLine) => {
+        if (specLine instanceof DefinitionLine) {
+            return convertDefinitionLine(specLine);
+        } else if (specLine instanceof IdLine) {
+            if (convertIdLine === null) {
+                throw new Error("Unexpected ID line.");
+            }
+            return convertIdLine(specLine);
+        } else {
+            return specLine.toHtml();
+        }
+    }).join("\n");
+};
+
+export const convertNumberToHexadecimal = (value: number, length = 2): string => {
+    let text = value.toString(16).toUpperCase();
+    while (text.length < length) {
+        text = "0" + text;
+    }
+    return "0x" + text;
+};
 
 export const populateTemplatePlaceholders = (
     templateText: string,
@@ -194,7 +226,18 @@ export const generateDocumentationFiles = (directoryPath: string): string[] => {
     const templateText = fs.readFileSync(templatePath, "utf8");
     const instructionsText = getSpecText("instructions");
     const specLines = parseSpecLines(instructionsText);
-    const instructionsHtml = "TODO: Generate instructions HTML.";
+    const instructionsHtml = createSpecHtml(
+        specLines,
+        (definitionLine) => {
+            const names = definitionLine.memberLines.map((memberLine) => memberLine.name);
+            return `<p><span class="code">${definitionLine.name} ${names.join(", ")}</span></p>`;
+        },
+        (idLine) => {
+            const { definitionLine } = idLine;
+            const opcodeText = convertNumberToHexadecimal(definitionLine.id);
+            return `<p><span class="code">${definitionLine.name}</span> opcode = <span class="code">${opcodeText}</span></p>`
+        },
+    );
     let documentHtml = populateTemplatePlaceholders(templateText, {
         INSTRUCTIONS: instructionsHtml
     });

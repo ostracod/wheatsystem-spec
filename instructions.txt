@@ -3,11 +3,13 @@
 
 $ wrt = 0x00
 # Writes a value from one memory location to another.
+@ OPCODE
 > (sInt) dest = Destination for writing
 > (sInt) value = Value to write
 
 $ wrtBuff = 0x01
 # Copies a sequence of bytes between memory locations. `dest` and `buff` may overlap each other in memory.
+@ OPCODE
 > (any) dest = Start of the destination buffer
 > (any) buff = Start of the source buffer
 > (sInt) size = Number of bytes in the buffer
@@ -15,35 +17,42 @@ $ wrtBuff = 0x01
 
 $ newArgFrame = 0x02
 # Creates a new argument frame to feed into the next function invocation. If an argument frame already exists, it will be deleted first.
+@ OPCODE
 > (sInt) size = Size of the new argument frame
 
 $ newAlloc = 0x03
 # Creates a new heap allocation.
+@ OPCODE
 > (ptr) dest = Destination for the new heap allocation
 > (sInt8) attrs = Attributes of the new heap allocation
 > (sInt) size = Size of the new heap allocation
 
 $ delAlloc = 0x04
 # Deletes a heap allocation.
+@ OPCODE
 > (ptr) alloc = Heap allocation
 
 $ allocAttrs = 0x05
 # Retrieves the attributes of a heap allocation.
+@ OPCODE
 > (sInt8) dest = Destination for the attributes
 > (ptr) alloc = Heap allocation
 
 $ allocSize = 0x06
 # Retrieves the size of a heap allocation.
+@ OPCODE
 > (sInt) dest = Destination for the size
 > (ptr) alloc = Heap allocation
 
 $ allocCreator = 0x07
 # Retrieves the file handle of the application which created the given heap allocation. The result is null if the allocation was created by the system.
+@ OPCODE
 > (ptr appHandle) dest = Destination for the result
 > (ptr) alloc = Heap allocation
 
 $ setAllocAttrs = 0x08
 # Modifies the attributes of the given heap allocation.
+@ OPCODE
 > (ptr) alloc = Heap allocation
 > (sInt8) attrs = Allocation attributes
 
@@ -51,71 +60,86 @@ $ setAllocAttrs = 0x08
 
 $ jmp = 0x10
 # Jumps control flow to another instruction within the current function.
+@ OPCODE
 > (const sInt) instrOffset = File offset from start of instruction body
 * Throws `indexErr` if `instrOffset` is outside instruction body bounds.
 
 $ jmpZ = 0x11
 # Jumps control flow to another instruction if the given value is zero.
+@ OPCODE
 > (const sInt) instrOffset = File offset from start of instruction body
 > (sInt) cond = Condition value
 * Throws `indexErr` if `instrOffset` is outside instruction body bounds.
 
 $ jmpNZ = 0x12
 # Jumps control flow to another instruction if the given value is not zero.
+@ OPCODE
 > (const sInt) instrOffset = File offset from start of instruction body
 > (sInt) cond = Condition value
 * Throws `indexErr` if `instrOffset` is outside instruction body bounds.
 
 $ wait = 0x13
 # Blocks execution of the current function invocation, unless the `wait` instruction has been excused from blocking. Will stop blocking if the current app calls the `resume` instruction in another thread.
+@ OPCODE
 
 $ resume = 0x14
 # Causes all function invocations belonging to the current app to become unblocked. If no function invocations are blocked, then the next `wait` instruction is excused from blocking.
+@ OPCODE
 
 ! ERROR INSTRUCTIONS
 
 $ setErrJmp = 0x20
 # Configures an error handler within the current function. If an error is thrown, control flow will jump to the error handler.
+@ OPCODE
 > (const sInt) instrOffset = File offset from start of instruction body
 
 $ clrErrJmp = 0x21
 # Removes any error handler from the current function. If an error is thrown, it will be passed to the invoking function.
+@ OPCODE
 
 $ throw = 0x22
 # Throws an error which will be handled by the invoking function. The error code must be in the range of `s8`.
+@ OPCODE
 > (sInt8) errCode = Error code
 * Throws `numRangeErr` if `code` is not in the range of `s8`.
 
 $ err = 0x23
 # Retrieves the code of the last error which was caught in the current function. The result will be 0 if no error has been caught by an error handler.
+@ OPCODE
 > (sInt8) dest = Destination for the error code
 
 ! FUNCTION INSTRUCTIONS
 
 $ findFunc = 0x30
 # Searches for a function with the given ID in the given application. If such a function is not found, the result is -1.
+@ OPCODE
 > (sInt) dest = Destination for the function index
 > (ptr appHandle) appHandle = Application file handle
 > (sInt) funcId = Function ID
 
 $ call = 0x31
 # Invokes a function which is defined in the current application.
+@ OPCODE
 > (sInt) funcIndex = Index of a function in the function table
 
 $ callRemote = 0x32
 # Invokes a function which may be defined in another application.
+@ OPCODE
 > (ptr appHandle) appHandle = Application file handle
 > (sInt) funcIndex = Index of a function in the function table
 
 $ ret = 0x33
 # Exits the current function and returns control flow to the invoking function.
+@ OPCODE
 
 $ caller = 0x34
 # Retrieves the file handle of the application which invoked the current function.
+@ OPCODE
 > (ptr appHandle) dest = Destination for the application file handle
 
 $ funcIsGuarded = 0x35
 # Retrieves whether the function defined in the given application is guarded.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (ptr appHandle) appHandle = Application file handle
 > (sInt) funcIndex = Index of a function in the function table
@@ -124,35 +148,41 @@ $ funcIsGuarded = 0x35
 
 $ bNot = 0x40
 # Performs bitwise NOT with the given value.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value = Operand
 
 $ bOr = 0x41
 # Performs bitwise OR with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ bAnd = 0x42
 # Performs bitwise AND with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ bXor = 0x43
 # Performs bitwise XOR with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ bLeft = 0x44
 # Performs bitshift left with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = Value to shift
 > (sInt8) value2 = Amount by which to shift
 
 $ bRight = 0x45
 # Performs bitshift right with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = Value to shift
 > (sInt8) value2 = Amount by which to shift
@@ -161,24 +191,28 @@ $ bRight = 0x45
 
 $ equ = 0x50
 # Determines whether the given values are equal.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ nEqu = 0x51
 # Determines whether the given values are not equal.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ gre = 0x52
 # Determines whether the first value is greater than the second value.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ nGre = 0x53
 # Determines whether the first value is not greater than the second value.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
@@ -187,24 +221,28 @@ $ nGre = 0x53
 
 $ add = 0x60
 # Performs addition with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ sub = 0x61
 # Performs subtraction with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ mul = 0x62
 # Performs multiplication with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
 
 $ div = 0x63
 # Performs division with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
@@ -212,6 +250,7 @@ $ div = 0x63
 
 $ mod = 0x64
 # Performs the modulo operation with the given values.
+@ OPCODE
 > (sInt) dest = Destination for the result
 > (sInt) value1 = First operand
 > (sInt) value2 = Second operand
@@ -221,27 +260,33 @@ $ mod = 0x64
 
 $ launch = 0x70
 # Launches the given application if it is not already running.
+@ OPCODE
 > (ptr appHandle) appHandle = Application file handle
 
 $ thisApp = 0x71
 # Retrieves the file handle of the current application.
+@ OPCODE
 > (ptr appHandle) dest = Destination for the application file handle
 
 $ quitApp = 0x72
 # Terminates the current application.
+@ OPCODE
 
 $ appIsRunning = 0x73
 # Retrieves whether the given application is running.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (ptr appHandle) appHandle = Application file handle
 
 $ appInitErr = 0x74
 # Retrieves the code of the unhandled error which terminated the `init` function of the given application. The result will be 0 if the given application has no associated `init` error. The `init` error will persist until `appHandle` is deleted by the system, or until the application is launched again.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (ptr appHandle) appHandle = Application file handle
 
 $ killApp = 0x75
 # Requests for the given application to terminate.
+@ OPCODE
 > (ptr appHandle) appHandle = Application file handle
 * Throws `permErr` if the invoking application does not hold admin permission.
 
@@ -249,6 +294,7 @@ $ killApp = 0x75
 
 $ newFile = 0x80
 # Creates a new file.
+@ OPCODE
 > (ptr array sInt8) name = Name of the new file
 > (sInt8) type = Type of the new file
 > (sInt8) isGuarded = Whether the new file should be guarded
@@ -257,19 +303,23 @@ $ newFile = 0x80
 
 $ delFile = 0x81
 # Deletes the given file.
+@ OPCODE
 > (ptr fileHandle) fileHandle = File handle
 
 $ openFile = 0x82
 # Retrieves a file handle for the given file. After the current application finishes using the file handle, the application should perform the `closeFile` instruction. Otherwise, the system may accumulate garbage.
+@ OPCODE
 > (ptr fileHandle) dest = Destination for the file handle
 > (ptr array sInt8) name = File name
 
 $ closeFile = 0x83
 # Indicates to the system that the current application has finished using the given file handle. The system may delete `fileHandle` if all other applications have also closed the file handle.
+@ OPCODE
 > (ptr fileHandle) fileHandle = File handle
 
 $ readFile = 0x84
 # Reads a sequences of bytes from the given file into a buffer.
+@ OPCODE
 > (any) dest = Destination for file data
 > (ptr fileHandle) fileHandle = File handle
 > (sInt) pos = File position
@@ -279,6 +329,7 @@ $ readFile = 0x84
 
 $ wrtFile = 0x85
 # Writes a sequences of bytes from the given buffer into a file.
+@ OPCODE
 > (ptr fileHandle) fileHandle = File handle
 > (sInt) pos = File position
 > (any) buff = Data buffer
@@ -290,30 +341,36 @@ $ wrtFile = 0x85
 
 $ allFileNames = 0x90
 # Retrieves a list of all file names in the system volume.
+@ OPCODE
 > (ptr array ptr array sInt8) dest = Destination for the list of file names
 
 $ fileExists = 0x91
 # Retrieves whether a file with the given name exists.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (ptr array sInt8) name = File name
 
 $ fileName = 0x92
 # Retrieves the name of the given file.
+@ OPCODE
 > (ptr array sInt8) dest = Destination for the file name
 > (ptr fileHandle) fileHandle = File handle
 
 $ fileType = 0x93
 # Retrieves the type of the given file.
+@ OPCODE
 > (sInt8) dest = Destination for the file type
 > (ptr fileHandle) fileHandle = File handle
 
 $ fileIsGuarded = 0x94
 # Retrieves whether the given file is guarded.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (ptr fileHandle) fileHandle = File handle
 
 $ fileSize = 0x95
 # Retrieves the size of the given file.
+@ OPCODE
 > (sInt) dest = Destination for the file size
 > (ptr fileHandle) fileHandle = File handle
 
@@ -321,38 +378,46 @@ $ fileSize = 0x95
 
 $ hasAdminPerm = 0xA0
 # Retrieves whether the given application holds admin permission.
+@ OPCODE
 > (sInt8) dest = Destination for the result
 > (ptr appHandle) appHandle = Application file handle
 
 $ giveAdminPerm = 0xA1
 # Grants admin permission to the given application.
+@ OPCODE
 > (ptr appHandle) appHandle = Application file handle
 
 $ delAdminPerm = 0xA2
 # Deletes admin permission from the given application.
+@ OPCODE
 > (ptr appHandle) appHandle = Application file handle
 
 ! RESOURCE INSTRUCTIONS
 
 $ memSize = 0xB0
 # Retrieves the total amount of memory in the system.
+@ OPCODE
 > (sInt) dest = Destination for the amount
 
 $ appMemSize = 0xB1
 # Retrieves the amount of memory used by the given application.
+@ OPCODE
 > (sInt) dest = Destination for the amount
 > (ptr appHandle) appHandle = Application file handle
 
 $ memSizeLeft = 0xB2
 # Retrieves the amount of unused memory remaining in the system.
+@ OPCODE
 > (sInt) dest = Destination for the amount
 
 $ volSize = 0xB3
 # Retrieves the total amount of storage in the system volume.
+@ OPCODE
 > (sInt) dest = Destination for the amount
 
 $ volSizeLeft = 0xB4
 # Retrieves the amount of unused storage remaining in the system volume.
+@ OPCODE
 > (sInt) dest = Destination for the amount
 
 
