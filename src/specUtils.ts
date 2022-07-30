@@ -1,9 +1,11 @@
 
 import * as fs from "fs";
 import * as pathUtils from "path";
-import { templateFilePath, instructionsFilePath } from "./constants.js";
+import { projectDirectoryPath } from "./constants.js";
 import { SpecLine, DefinitionLine, MemberLine, TitleLine, DescriptionLine, BulletLine } from "./specLine.js";
 import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandleType } from "./dataType.js";
+import { InstructionDefinition } from "./definition.js";
+import { InstructionArg } from "./member.js";
 
 const typeCreatorMap: { [name: string]: () => DataType } = {
     any: () => new DataType(),
@@ -13,14 +15,18 @@ const typeCreatorMap: { [name: string]: () => DataType } = {
     fileHandle: () => new FileHandleType(),
     appHandle: () => new AppHandleType(),
 };
+const specTextMap: { [name: string]: string } = {};
 
-export const readTemplateText = (): string => (
-    fs.readFileSync(templateFilePath, "utf8")
-);
-
-export const readInstructionsText = (): string => (
-    fs.readFileSync(instructionsFilePath, "utf8")
-);
+export const getSpecText = (name: string): string => {
+    if (name in specTextMap) {
+        return specTextMap[name];
+    } else {
+        const specPath = pathUtils.join(projectDirectoryPath, name + ".txt");
+        const specText = fs.readFileSync(specPath, "utf8");
+        specTextMap[name] = specText;
+        return specText;
+    }
+};
 
 export const splitEqualityStatement = (statement: string): [string, string | null] => {
     const index = statement.indexOf("=");
@@ -120,9 +126,35 @@ export const parseDataType = (text: string): DataType => {
     return dataType;
 };
 
+export const createInstructionDefinition = (
+    definitionLine: DefinitionLine,
+): InstructionDefinition => {
+    const definitionName = definitionLine.name;
+    const args = definitionLine.memberLines.map((memberLine) => {
+        const { name: argName, type: typeText } = memberLine;
+        if (typeText === null) {
+            throw new Error(`"${argName}" argument of "${definitionName}" instruction is missing data type.`);
+        }
+        const dataType = parseDataType(typeText);
+        return new InstructionArg(argName, dataType);
+    });
+    return new InstructionDefinition(definitionName, definitionLine.id, args);
+}
+
+export const createInstructionDefinitions = (
+    specLines: SpecLine[],
+): InstructionDefinition[] => {
+    const definitionLines = specLines.filter(
+        (specLine) => specLine instanceof DefinitionLine,
+    ) as DefinitionLine[];
+    return definitionLines.map(
+        (definitionLine) => createInstructionDefinition(definitionLine),
+    );
+}
+
 export const populateTemplatePlaceholders = (
     templateText: string,
-    instructionsHtml: string,
+    htmlMap: { [name: string]: string },
 ): string => {
     let output = templateText;
     const date = new Date();
@@ -134,7 +166,9 @@ export const populateTemplatePlaceholders = (
         minute: "2-digit",
         timeZoneName: "short",
     }));
-    output = output.replace("{INSTRUCTIONS}", instructionsHtml);
+    for (const name in htmlMap) {
+        output = output.replace(`{${name}}`, htmlMap[name]);
+    }
     return output;
 };
 
@@ -156,12 +190,14 @@ export const formatHtmlStyle = (documentHtml: string): string => {
 
 // Returns the paths of the documentation files.
 export const generateDocumentationFiles = (directoryPath: string): string[] => {
-    const templateText = readTemplateText();
-    const instructionsText = readInstructionsText();
+    const templatePath = pathUtils.join(projectDirectoryPath, "bytecodeTemplate.html");
+    const templateText = fs.readFileSync(templatePath, "utf8");
+    const instructionsText = getSpecText("instructions");
     const specLines = parseSpecLines(instructionsText);
-    console.log(specLines);
-    const instructionsHtml = "";
-    let documentHtml = populateTemplatePlaceholders(templateText, instructionsHtml);
+    const instructionsHtml = "TODO: Generate instructions HTML.";
+    let documentHtml = populateTemplatePlaceholders(templateText, {
+        INSTRUCTIONS: instructionsHtml
+    });
     documentHtml = formatHtmlStyle(documentHtml);
     const documentHtmlPath = pathUtils.join(directoryPath, "bytecode.html");
     fs.writeFileSync(documentHtmlPath, documentHtml);
