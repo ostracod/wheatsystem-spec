@@ -2,8 +2,8 @@
 export class DataType {
     isConstant: boolean;
     
-    constructor(isConstant: boolean) {
-        this.isConstant = isConstant;
+    constructor() {
+        this.isConstant = false;
     }
 }
 
@@ -11,12 +11,8 @@ export class IntegerType extends DataType {
     isSigned: boolean | null;
     bitAmount: number | null;
     
-    constructor(
-        isConstant: boolean,
-        isSigned: boolean | null = null,
-        bitAmount: number | null = null,
-    ) {
-        super(isConstant);
+    constructor(isSigned: boolean | null = null, bitAmount: number | null = null) {
+        super();
         this.isSigned = isSigned;
         this.bitAmount = bitAmount;
     }
@@ -25,8 +21,8 @@ export class IntegerType extends DataType {
 export class PointerType extends IntegerType {
     elementType: DataType;
     
-    constructor(isConstant: boolean, elementType: DataType) {
-        super(isConstant, true, 32);
+    constructor(elementType: DataType) {
+        super(true, 32);
         this.elementType = elementType;
     }
 }
@@ -35,8 +31,8 @@ export class ArrayType extends DataType {
     elementType: DataType;
     length: number | null;
     
-    constructor(isConstant: boolean, elementType: DataType, length: number | null = null) {
-        super(isConstant);
+    constructor(elementType: DataType, length: number | null = null) {
+        super();
         this.elementType = elementType;
         this.length = length;
     }

@@ -3,6 +3,16 @@ import * as fs from "fs";
 import * as pathUtils from "path";
 import { templateFilePath, instructionsFilePath } from "./constants.js";
 import { SpecLine, DefinitionLine, MemberLine, TitleLine, DescriptionLine, BulletLine } from "./specLine.js";
+import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandleType } from "./dataType.js";
+
+const typeCreatorMap: { [name: string]: () => DataType } = {
+    any: () => new DataType(),
+    sInt: () => new IntegerType(true),
+    sInt8: () => new IntegerType(true, 8),
+    sInt32: () => new IntegerType(true, 32),
+    fileHandle: () => new FileHandleType(),
+    appHandle: () => new AppHandleType(),
+};
 
 export const readTemplateText = (): string => (
     fs.readFileSync(templateFilePath, "utf8")
@@ -70,6 +80,44 @@ export const parseSpecLines = (specText: string): SpecLine[] => {
         }
     }
     return output;
+};
+
+export const parseDataType = (text: string): DataType => {
+    const terms = text.split(" ");
+    let index = terms.length - 1;
+    const lastTerm = terms[index];
+    const typeCreator = typeCreatorMap[lastTerm];
+    let dataType: DataType;
+    if (typeof typeCreator === "undefined") {
+        dataType = new DataType();
+    } else {
+        dataType = typeCreator();
+        index -= 1;
+    }
+    while (index >= 0) {
+        const term = terms[index];
+        index -= 1;
+        if (term === "const") {
+            dataType.isConstant = true;
+        } else if (term === "ptr") {
+            dataType = new PointerType(dataType);
+        } else if (term === "array") {
+            dataType = new ArrayType(dataType);
+        } else if (term.startsWith("array[")) {
+            if (!term.endsWith("]")) {
+                throw new Error(`Malformed array type "${term}".`);
+            }
+            const lengthText = term.substring(6, term.length - 1);
+            const length = parseInt(lengthText, 10);
+            if (Number.isNaN(length)) {
+                throw new Error(`"${lengthText}" is not a valid array length.`);
+            }
+            dataType = new ArrayType(dataType, length);
+        } else {
+            throw new Error(`Unknown data type "${term}".`);
+        }
+    }
+    return dataType;
 };
 
 export const populateTemplatePlaceholders = (

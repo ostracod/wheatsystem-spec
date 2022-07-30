@@ -19,18 +19,18 @@ $ listenTerm = 3
 
 $ termSize = 4
 # Retrieves the dimensions of the terminal controlled by the receiving terminal driver. The dimensions are measured in number of characters.
-> (s32) widthDest = Destination for the width
-> (s32) heightDest = Destination for the height
+> (sInt32) widthDest = Destination for the width
+> (sInt32) heightDest = Destination for the height
 
 $ wrtTerm = 5 
 # Displays text on the terminal of the receiving terminal driver. Text will wrap around to the next line after it reaches the end of the screen.
-> (s32) x = Horizontal coordinate
-> (s32) y = Vertical coordinate
-> (s32) text = Pointer to text allocation
+> (sInt32) x = Horizontal coordinate
+> (sInt32) y = Vertical coordinate
+> (ptr array sInt8) text = Pointer to text allocation
 
 $ termInput = 6
 # Invoked by a terminal driver to notify the receiving observer when a key has been typed.
-> (s8) key = Typed key code
+> (sInt8) key = Typed key code
 
 # Terminal key codes for visible characters have ASCII values. Other key codes include the following:
 * Space = 32
@@ -51,22 +51,22 @@ $ termInput = 6
 
 $ startSerial = 7
 # Causes the receiving serial driver to open the given serial port, and assigns the calling application as an observer. When the port receives input data, the serial driver will will invoke the `serialInput` function on the port's observer.
-> (s8) port = Serial port number
-> (s32) baudRate = Serial port baud rate
+> (sInt8) port = Serial port number
+> (sInt32) baudRate = Serial port baud rate
 
 $ stopSerial = 8
 # Causes the receiving serial driver to close the given serial port. The port will no longer send or receive data.
-> (s8) port = Serial port number
+> (sInt8) port = Serial port number
 
 $ wrtSerial = 9
 # Causes the receiving serial driver to output data over the given serial port.
-> (s8) port = Serial port number
-> (s32) buff = Pointer to buffer allocation
+> (sInt8) port = Serial port number
+> (ptr) buff = Pointer to buffer allocation
 
 $ serialInput = 10
 # Invoked by a serial driver to notify the receiving observer when a serial byte has been ingested.
-> (s8) port = Serial port number
-> (s8) value = Received serial data
+> (sInt8) port = Serial port number
+> (sInt8) value = Received serial data
 
 ! GPIO DRIVER FUNCTIONS
 
@@ -74,8 +74,8 @@ $ serialInput = 10
 
 $ setGpioMode = 11
 # Sets the I/O mode of the given GPIO pin.
-> (s32) pin = GPIO pin number
-> (s8) mode = I/O mode
+> (sInt32) pin = GPIO pin number
+> (sInt8) mode = I/O mode
 
 # Available I/O modes include the following:
 * Digital read = 0
@@ -86,12 +86,12 @@ $ setGpioMode = 11
 
 $ readGpio = 12
 # Reads a digital or analog value from the given GPIO pin.
-> (s32) dest = Destination for the value
-> (s32) pin = GPIO pin number
+> (sInt32) dest = Destination for the value
+> (sInt32) pin = GPIO pin number
 
 $ wrtGpio = 13
 # Writes a digital or analog value to the given GPIO pin.
-> (s32) pin = GPIO pin number
-> (s32) value = Value to write
+> (sInt32) pin = GPIO pin number
+> (sInt32) value = Value to write
 
 
