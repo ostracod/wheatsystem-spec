@@ -8,7 +8,10 @@ This repository may also be used as a Node.js module to provide opcodes and argu
 * `interfaces`: Provides TypeScript interfaces used by this module.
 * `constants`: Provides constant values used by this module.
 * `specUtils`: Provides functions to generate documentation.
-* `instructionClasses`: Provides classes related to bytecode instructions.
+* `specLine`: Provides classes which store lines of specification.
+* `definition`: Provides classes for error, instruction, and function definitions.
+* `member`: Provides classes for arguments of instructions and functions.
+* `dataType`: Provides classes to specify data types of arguments.
 
 ## Usage
 
