@@ -2,6 +2,11 @@
 import { DataType } from "./dataType.js";
 
 export abstract class SpecLine {
+    indentation: number;
+    
+    constructor() {
+        this.indentation = 0;
+    }
     
     isListItem(): boolean {
         return false;

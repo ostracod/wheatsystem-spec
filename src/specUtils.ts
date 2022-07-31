@@ -8,6 +8,7 @@ import { InstructionDefinition } from "./definition.js";
 import { InstructionArg } from "./member.js";
 import { LineConverter, InstructionLineConverter } from "./lineConverter.js";
 
+const indentationText = "    ";
 const typeCreatorMap: { [name: string]: () => DataType } = {
     any: () => new DataType(),
     sInt: () => new IntegerType(true),
@@ -79,24 +80,42 @@ export const parseDataType = (text: string): DataType => {
     return dataType;
 };
 
+const measureIndentation = (text: string): number => {
+    let startIndex = 0;
+    let output = 0;
+    while (true) {
+        const endIndex = startIndex + indentationText.length;
+        if (endIndex > text.length
+                || text.substring(startIndex, endIndex) !== indentationText) {
+            break;
+        }
+        startIndex = endIndex;
+        output += 1;
+    }
+    return output;
+};
+
 export const parseSpecLines = (specText: string): SpecLine[] => {
     const output: SpecLine[] = [];
-    let definitionLine = null;
+    let currentDefinitionLine = null;
     const lines = specText.split("\n");
-    for (const line of lines) {
+    for (const untrimmedLine of lines) {
+        const line = untrimmedLine.trim();
         if (line.length < 2) {
             continue;
         }
+        const indentation = measureIndentation(untrimmedLine);
         const character = line.charAt(0);
         const text = line.substring(2, line.length);
+        let specLine: SpecLine;
         if (character === "!") {
-            output.push(new TitleLine(text));
+            specLine = new TitleLine(text);
         } else if (character === "#") {
-            output.push(new DescriptionLine(text));
+            specLine = new DescriptionLine(text);
         } else if (character === "*") {
-            output.push(new BulletLine(text));
+            specLine = new BulletLine(text);
         } else if (character === "@") {
-            output.push(new IdLine(definitionLine));
+            specLine = new IdLine(currentDefinitionLine);
         } else if (character === "$") {
             const [name, idText] = splitEqualityStatement(text);
             let id: number | null;
@@ -107,8 +126,8 @@ export const parseSpecLines = (specText: string): SpecLine[] => {
             } else {
                 id = parseInt(idText, 10);
             }
-            definitionLine = new DefinitionLine(name, id);
-            output.push(definitionLine);
+            currentDefinitionLine = new DefinitionLine(name, id);
+            specLine = currentDefinitionLine;
         } else if (character === ">") {
             let type: DataType | null;
             let statement: string;
@@ -123,9 +142,13 @@ export const parseSpecLines = (specText: string): SpecLine[] => {
             }
             const [name, description] = splitEqualityStatement(statement);
             const memberLine = new MemberLine(name, type, description);
-            definitionLine.memberLines.push(memberLine);
-            output.push(memberLine);
+            currentDefinitionLine.memberLines.push(memberLine);
+            specLine = memberLine;
+        } else {
+            throw new Error(`Unknown line prefix "${character}".`);
         }
+        specLine.indentation = indentation;
+        output.push(specLine);
     }
     return output;
 };

@@ -1,74 +1,74 @@
 
 $ genericErr = 0x01
-# Thrown if a problem occurs which cannot be described by a more specific error code.
+    # Thrown if a problem occurs which cannot be described by a more specific error code.
 
 $ noImplErr = 0x02
-# Thrown if no implementation is available for the given operation. This includes the following circumstances:
-* The interpreter tries to evaluate an instruction which has an unknown opcode
+    # Thrown if no implementation is available for the given operation. This includes the following circumstances:
+    * The interpreter tries to evaluate an instruction which has an unknown opcode
 
 $ typeErr = 0x03
-# Thrown if a value or resource has the wrong type. This includes the following circumstances:
-* A file has an unexpected type
-* An instruction argument has an unknown reference type or data type
-* An instruction argument is not constant when a constant value is expected
+    # Thrown if a value or resource has the wrong type. This includes the following circumstances:
+    * A file has an unexpected type
+    * An instruction argument has an unknown reference type or data type
+    * An instruction argument is not constant when a constant value is expected
 
 $ numRangeErr = 0x04
-# Thrown if a number argument is not in an acceptable range.
+    # Thrown if a number argument is not in an acceptable range.
 
 $ indexErr = 0x05
-# Thrown if an index argument is out of bounds or refers to an invalid item. This includes the following circumstances:
-* An index in a frame is out of bounds
-* An index in the app data region is out of bounds
-* An index in a heap allocation is out of bounds
-* An index in a function table is out of bounds
+    # Thrown if an index argument is out of bounds or refers to an invalid item. This includes the following circumstances:
+    * An index in a frame is out of bounds
+    * An index in the app data region is out of bounds
+    * An index in a heap allocation is out of bounds
+    * An index in a function table is out of bounds
 
 $ lenErr = 0x06
-# Thrown if an argument representing a length or size is invalid. This includes the following circumstances:
-* A length or size argument is negative
-* An argument overflows its parent region because the argument is too long
+    # Thrown if an argument representing a length or size is invalid. This includes the following circumstances:
+    * A length or size argument is negative
+    * An argument overflows its parent region because the argument is too long
 
 $ ptrErr = 0x07
-# Thrown if a pointer argument has a malformed value, or if the pointer references a deleted heap allocation.
+    # Thrown if a pointer argument has a malformed value, or if the pointer references a deleted heap allocation.
 
 $ nullErr = 0x08
-# Thrown if a pointer argument has an unexpected null value.
+    # Thrown if a pointer argument has an unexpected null value.
 
 $ dataErr = 0x09
-# Thrown if an argument data structure contains malformed data. This includes the following circumstances:
-* A file position parameter in a bytecode application file has an unexpected value
-* A region size parameter in a bytecode application file has an unexpected value
+    # Thrown if an argument data structure contains malformed data. This includes the following circumstances:
+    * A file position parameter in a bytecode application file has an unexpected value
+    * A region size parameter in a bytecode application file has an unexpected value
 
 $ argFrameErr = 0x0A
-# Thrown when an argument frame is missing or has an invalid size. This includes the following circumstances:
-* An application tries to access a missing argument frame
-* An argument frame has an unexpected size for a function invocation
-* A function invocation expects an argument frame, but none is provided
+    # Thrown when an argument frame is missing or has an invalid size. This includes the following circumstances:
+    * An application tries to access a missing argument frame
+    * An argument frame has an unexpected size for a function invocation
+    * A function invocation expects an argument frame, but none is provided
 
 $ missingErr = 0x0B
-# Thrown if a necessary resource does not exist. This includes the following circumstances:
-* A file required for an operation does not exist
+    # Thrown if a necessary resource does not exist. This includes the following circumstances:
+    * A file required for an operation does not exist
 
 $ stateErr = 0x0C
-# Thrown when trying to use a resource which is in an invalid state. This includes the following circumstances:
-* An application required for an operation is not running
-* An application required for an operation is being throttled
+    # Thrown when trying to use a resource which is in an invalid state. This includes the following circumstances:
+    * An application required for an operation is not running
+    * An application required for an operation is being throttled
 
 $ permErr = 0x0D
-# Thrown if the current application has insufficient permissions to perform an action. This includes the following circumstances:
-* An application without admin permission tries to access a guarded heap allocation of another application
-* An application without admin permission tries to invoke a guarded function of another application
-* An application without admin permission tries to access a guarded file
-* An application without admin permission tries to give or remove admin permission
-* An application provides a text allocation argument, but the application does not have permission to access the allocation
+    # Thrown if the current application has insufficient permissions to perform an action. This includes the following circumstances:
+    * An application without admin permission tries to access a guarded heap allocation of another application
+    * An application without admin permission tries to invoke a guarded function of another application
+    * An application without admin permission tries to access a guarded file
+    * An application without admin permission tries to give or remove admin permission
+    * An application provides a text allocation argument, but the application does not have permission to access the allocation
 
 $ capacityErr = 0x0E
-# Thrown if the system has insufficient hardware resources for the operation. This includes the following circumstances:
-* An application tries to create a memory allocation when memory is full
-* An application tries to create a file when the system volume is full
+    # Thrown if the system has insufficient hardware resources for the operation. This includes the following circumstances:
+    * An application tries to create a memory allocation when memory is full
+    * An application tries to create a file when the system volume is full
 
 $ throttleErr = 0x0F
-# Thrown if the current function invocation should terminate prematurely. This includes the following circumstances:
-* An application tries to kill another application
-* The system tries to kill an application to free memory
+    # Thrown if the current function invocation should terminate prematurely. This includes the following circumstances:
+    * An application tries to kill another application
+    * The system tries to kill an application to free memory
 
 
