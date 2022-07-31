@@ -7,6 +7,7 @@ import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandl
 import { InstructionDefinition } from "./definition.js";
 import { InstructionArg } from "./member.js";
 import { LineConverter, InstructionLineConverter } from "./lineConverter.js";
+import { SpecBlock, IndentationBlock, LineBlock, ListBlock } from "./specBlock.js";
 
 const indentationText = "    ";
 const typeCreatorMap: { [name: string]: () => DataType } = {
@@ -181,32 +182,52 @@ export const createInstructionDefinitions = (
     );
 }
 
+export const groupLinesByIndentation = (specLines: SpecLine[]): SpecLine[][] => {
+    const output: SpecLine[][] = [];
+    let currentGroup: SpecLine[] = [];
+    let currentIndentation = -1;
+    for (const specLine of specLines) {
+        const { indentation } = specLine;
+        if (indentation === currentIndentation) {
+            currentGroup.push(specLine);
+        } else {
+            currentGroup = [specLine];
+            output.push(currentGroup);
+            currentIndentation = indentation;
+        }
+    }
+    return output;
+};
+
+export const convertLinesToBlocks = (specLines: SpecLine[]): SpecBlock[] => {
+    const output: SpecBlock[] = [];
+    let currentList: ListBlock | null = null;
+    for (const specLine of specLines) {
+        if (specLine.isListItem()) {
+            if (currentList === null) {
+                currentList = new ListBlock();
+                output.push(currentList);
+            }
+            currentList.lines.push(specLine);
+        } else {
+            output.push(new LineBlock(specLine));
+            currentList = null;
+        }
+    }
+    return output;
+}
+
 export const createSpecHtml = (
     specLines: SpecLine[],
     lineConverter: LineConverter
 ): string => {
-    const paragraphs: (SpecLine | SpecLine[])[] = [];
-    let currentList: SpecLine[] = null;
-    specLines.forEach((specLine) => {
-        if (specLine.isListItem()) {
-            if (currentList === null) {
-                currentList = [];
-                paragraphs.push(currentList);
-            }
-            currentList.push(specLine);
-        } else {
-            paragraphs.push(specLine);
-            currentList = null;
-        }
+    const lineGroups = groupLinesByIndentation(specLines);
+    const specBlocks = lineGroups.map((lineGroup) => {
+        const { indentation } = lineGroup[0];
+        const nestedBlocks = convertLinesToBlocks(lineGroup);
+        return new IndentationBlock(indentation, nestedBlocks);
     });
-    return paragraphs.map((paragraph) => {
-        if (Array.isArray(paragraph)) {
-            const htmlList = paragraph.map((specLine) => lineConverter.convertLine(specLine));
-            return `<ul>\n${htmlList.join("\n")}\n</ul>`;
-        } else {
-            return lineConverter.convertLine(paragraph);
-        }
-    }).join("\n");
+    return specBlocks.map((specBlock) => specBlock.toHtml(lineConverter)).join("\n");
 };
 
 export const populateTemplatePlaceholders = (

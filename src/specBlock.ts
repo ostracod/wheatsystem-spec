@@ -38,10 +38,10 @@ export class IndentationBlock extends SpecBlock {
     indentation: number;
     blocks: SpecBlock[];
     
-    constructor(indentation: number) {
+    constructor(indentation: number, blocks: SpecBlock[]) {
         super();
         this.indentation = indentation;
-        this.blocks = [];
+        this.blocks = blocks;
     }
     
     toHtml(lineConverter: LineConverter): string {
