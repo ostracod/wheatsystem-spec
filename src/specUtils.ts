@@ -185,7 +185,7 @@ export const populateTemplatePlaceholders = (
 ): string => {
     let output = templateText;
     const date = new Date();
-    output = output.replace("{TIMESTAMP}", date.toLocaleDateString("en-US", {
+    output = output.replace("{timestamp}", date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "numeric",
         day: "numeric",

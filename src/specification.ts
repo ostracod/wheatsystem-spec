@@ -9,7 +9,7 @@ import { InstructionArg } from "./member.js";
 import { LineConverter, InstructionLineConverter } from "./lineConverter.js";
 import { IndentationBlock } from "./specBlock.js";
 
-export abstract class Specification<T extends Definition> {
+export abstract class Specification<T extends Definition = Definition> {
     name: string;
     lineConverter: LineConverter;
     specLines: SpecLine[] | null;
