@@ -1,13 +1,6 @@
 
+import * as specUtils from "./specUtils.js";
 import { SpecLine, DefinitionLine, IdLine } from "./specLine.js";
-
-const convertNumberToHexadecimal = (value: number, length = 2): string => {
-    let text = value.toString(16).toUpperCase();
-    while (text.length < length) {
-        text = "0" + text;
-    }
-    return "0x" + text;
-};
 
 export abstract class LineConverter {
     
@@ -37,7 +30,7 @@ export class InstructionLineConverter extends LineConverter {
     
     convertIdLine(idLine: IdLine): string {
         const { definitionLine } = idLine;
-        const opcodeText = convertNumberToHexadecimal(definitionLine.id);
+        const opcodeText = specUtils.convertNumberToHexadecimal(definitionLine.id);
         return `<li><span class="code">${definitionLine.name}</span> opcode = <span class="code">${opcodeText}</span></li>`
     }
 }

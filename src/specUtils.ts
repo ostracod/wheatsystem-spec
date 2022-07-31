@@ -1,13 +1,7 @@
 
-import * as fs from "fs";
-import * as pathUtils from "path";
-import { projectDirectoryPath } from "./constants.js";
 import { SpecLine, DefinitionLine, IdLine, MemberLine, TitleLine, DescriptionLine, BulletLine } from "./specLine.js";
 import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandleType } from "./dataType.js";
-import { InstructionDefinition } from "./definition.js";
-import { InstructionArg } from "./member.js";
-import { LineConverter, InstructionLineConverter } from "./lineConverter.js";
-import { SpecBlock, IndentationBlock, LineBlock, ListBlock } from "./specBlock.js";
+import { SpecBlock, LineBlock, ListBlock } from "./specBlock.js";
 
 const indentationText = "    ";
 const typeCreatorMap: { [name: string]: () => DataType } = {
@@ -18,17 +12,13 @@ const typeCreatorMap: { [name: string]: () => DataType } = {
     fileHandle: () => new FileHandleType(),
     appHandle: () => new AppHandleType(),
 };
-const specTextMap: { [name: string]: string } = {};
 
-export const getSpecText = (name: string): string => {
-    if (name in specTextMap) {
-        return specTextMap[name];
-    } else {
-        const specPath = pathUtils.join(projectDirectoryPath, name + ".txt");
-        const specText = fs.readFileSync(specPath, "utf8");
-        specTextMap[name] = specText;
-        return specText;
+export const convertNumberToHexadecimal = (value: number, length = 2): string => {
+    let text = value.toString(16).toUpperCase();
+    while (text.length < length) {
+        text = "0" + text;
     }
+    return "0x" + text;
 };
 
 export const splitEqualityStatement = (statement: string): [string, string | null] => {
@@ -81,7 +71,7 @@ export const parseDataType = (text: string): DataType => {
     return dataType;
 };
 
-const measureIndentation = (text: string): number => {
+export const measureIndentation = (text: string): number => {
     let startIndex = 0;
     let output = 0;
     while (true) {
@@ -154,34 +144,6 @@ export const parseSpecLines = (specText: string): SpecLine[] => {
     return output;
 };
 
-export const createInstructionDefinition = (
-    definitionLine: DefinitionLine,
-): InstructionDefinition => {
-    const { name: definitionName, id } = definitionLine;
-    if (id === null) {
-        throw new Error(`"${definitionName}" instruction is missing opcode.`);
-    }
-    const args = definitionLine.memberLines.map((memberLine) => {
-        const { name: argName, type } = memberLine;
-        if (type === null) {
-            throw new Error(`"${argName}" argument of "${definitionName}" instruction is missing data type.`);
-        }
-        return new InstructionArg(argName, type);
-    });
-    return new InstructionDefinition(definitionName, id, args);
-}
-
-export const createInstructionDefinitions = (
-    specLines: SpecLine[],
-): InstructionDefinition[] => {
-    const definitionLines = specLines.filter(
-        (specLine) => specLine instanceof DefinitionLine,
-    ) as DefinitionLine[];
-    return definitionLines.map(
-        (definitionLine) => createInstructionDefinition(definitionLine),
-    );
-}
-
 export const groupLinesByIndentation = (specLines: SpecLine[]): SpecLine[][] => {
     const output: SpecLine[][] = [];
     let currentGroup: SpecLine[] = [];
@@ -217,19 +179,6 @@ export const convertLinesToBlocks = (specLines: SpecLine[]): SpecBlock[] => {
     return output;
 }
 
-export const createSpecHtml = (
-    specLines: SpecLine[],
-    lineConverter: LineConverter
-): string => {
-    const lineGroups = groupLinesByIndentation(specLines);
-    const specBlocks = lineGroups.map((lineGroup) => {
-        const { indentation } = lineGroup[0];
-        const nestedBlocks = convertLinesToBlocks(lineGroup);
-        return new IndentationBlock(indentation, nestedBlocks);
-    });
-    return specBlocks.map((specBlock) => specBlock.toHtml(lineConverter)).join("\n");
-};
-
 export const populateTemplatePlaceholders = (
     templateText: string,
     htmlMap: { [name: string]: string },
@@ -264,22 +213,6 @@ export const formatHtmlStyle = (documentHtml: string): string => {
         newList.push(text);
     });
     return newList.join("");
-};
-
-// Returns the paths of the documentation files.
-export const generateDocumentationFiles = (directoryPath: string): string[] => {
-    const templatePath = pathUtils.join(projectDirectoryPath, "bytecodeTemplate.html");
-    const templateText = fs.readFileSync(templatePath, "utf8");
-    const instructionsText = getSpecText("instructions");
-    const specLines = parseSpecLines(instructionsText);
-    const instructionsHtml = createSpecHtml(specLines, new InstructionLineConverter());
-    let documentHtml = populateTemplatePlaceholders(templateText, {
-        INSTRUCTIONS: instructionsHtml
-    });
-    documentHtml = formatHtmlStyle(documentHtml);
-    const documentHtmlPath = pathUtils.join(directoryPath, "bytecode.html");
-    fs.writeFileSync(documentHtmlPath, documentHtml);
-    return [documentHtmlPath];
 };
 
 
