@@ -1,7 +1,7 @@
 
-bytecode.html
-bytecodeInstructions.json
 node_modules
 dist
+bytecode.html
+functions.html
 
 

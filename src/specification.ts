@@ -4,9 +4,9 @@ import * as pathUtils from "path";
 import { projectDirectoryPath } from "./constants.js";
 import * as specUtils from "./specUtils.js";
 import { SpecLine, DefinitionLine } from "./specLine.js";
-import { Definition, ErrorDefinition, InstructionDefinition } from "./definition.js";
-import { InstructionArg } from "./member.js";
-import { LineConverter, ErrorLineConverter, InstructionLineConverter } from "./lineConverter.js";
+import { Definition, ErrorDefinition, InstructionDefinition, FunctionDefinition } from "./definition.js";
+import { InstructionArg, FunctionArg } from "./member.js";
+import { LineConverter, ErrorLineConverter, InstructionLineConverter, FunctionLineConverter } from "./lineConverter.js";
 import { SpecBlock, IndentationBlock } from "./specBlock.js";
 
 export abstract class Specification<T extends Definition = Definition> {
@@ -115,6 +115,28 @@ export class InstructionSpecification extends Specification<InstructionDefinitio
             return new InstructionArg(argName, type);
         });
         return new InstructionDefinition(definitionName, id, args);
+    }
+}
+
+export class FunctionSpecification extends Specification<FunctionDefinition> {
+    
+    constructor() {
+        super("functions", new FunctionLineConverter());
+    }
+    
+    createDefinition(definitionLine: DefinitionLine): FunctionDefinition {
+        const { name: definitionName, id } = definitionLine;
+        if (id === null) {
+            throw new Error(`"${definitionName}" function is missing ID.`);
+        }
+        const args = definitionLine.memberLines.map((memberLine) => {
+            const { name: argName, type } = memberLine;
+            if (type === null) {
+                throw new Error(`"${argName}" argument of "${definitionName}" function is missing data type.`);
+            }
+            return new FunctionArg(argName, type);
+        });
+        return new FunctionDefinition(definitionName, id, args);
     }
 }
 

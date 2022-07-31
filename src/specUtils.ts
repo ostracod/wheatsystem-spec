@@ -185,14 +185,15 @@ export const populateTemplatePlaceholders = (
 ): string => {
     let output = templateText;
     const date = new Date();
-    output = output.replace("{timestamp}", date.toLocaleDateString("en-US", {
+    const dateText = date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "numeric",
         day: "numeric",
         hour: "numeric",
         minute: "2-digit",
         timeZoneName: "short",
-    }));
+    });
+    output = output.replace("{timestamp}", `<p>This page was generated from <a href="https://github.com/ostracod/wheatsystem-spec">https://github.com/ostracod/wheatsystem-spec</a> at ${dateText}.</p>`);
     for (const name in htmlMap) {
         output = output.replace(`{${name}}`, htmlMap[name]);
     }

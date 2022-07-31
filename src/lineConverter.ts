@@ -43,4 +43,15 @@ export class InstructionLineConverter extends LineConverter {
     }
 }
 
+export class FunctionLineConverter extends LineConverter {
+    
+    convertDefinitionLine(definitionLine: DefinitionLine): string {
+        return "TODO: Convert to HTML.";
+    }
+    
+    convertIdLine(idLine: IdLine): string {
+        return "TODO: Convert to HTML.";
+    }
+}
+
 
