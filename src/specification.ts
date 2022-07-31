@@ -4,10 +4,10 @@ import * as pathUtils from "path";
 import { projectDirectoryPath } from "./constants.js";
 import * as specUtils from "./specUtils.js";
 import { SpecLine, DefinitionLine } from "./specLine.js";
-import { Definition, InstructionDefinition } from "./definition.js";
+import { Definition, ErrorDefinition, InstructionDefinition } from "./definition.js";
 import { InstructionArg } from "./member.js";
-import { LineConverter, InstructionLineConverter } from "./lineConverter.js";
-import { IndentationBlock } from "./specBlock.js";
+import { LineConverter, ErrorLineConverter, InstructionLineConverter } from "./lineConverter.js";
+import { SpecBlock, IndentationBlock } from "./specBlock.js";
 
 export abstract class Specification<T extends Definition = Definition> {
     name: string;
@@ -55,12 +55,20 @@ export abstract class Specification<T extends Definition = Definition> {
     
     createHtml(): string {
         const lineGroups = specUtils.groupLinesByIndentation(this.getSpecLines());
-        const specBlocks = lineGroups.map((lineGroup) => {
+        const topLevelBlocks: SpecBlock[] = [];
+        for (const lineGroup of lineGroups) {
             const { indentation } = lineGroup[0];
-            const nestedBlocks = specUtils.convertLinesToBlocks(lineGroup);
-            return new IndentationBlock(indentation, nestedBlocks);
-        });
-        return specBlocks.map((specBlock) => (
+            const specBlocks = specUtils.convertLinesToBlocks(lineGroup);
+            if (indentation <= 0) {
+                for (const specBlock of specBlocks) {
+                    topLevelBlocks.push(specBlock);
+                }
+            } else {
+                const specBlock = new IndentationBlock(indentation, specBlocks);
+                topLevelBlocks.push(specBlock);
+            }
+        }
+        return topLevelBlocks.map((specBlock) => (
             specBlock.toHtml(this.lineConverter)
         )).join("\n");
     }
@@ -70,6 +78,21 @@ export abstract class Specification<T extends Definition = Definition> {
             this.html = this.createHtml();
         }
         return this.html;
+    }
+}
+
+export class ErrorSpecification extends Specification<ErrorDefinition> {
+    
+    constructor() {
+        super("errors", new ErrorLineConverter());
+    }
+    
+    createDefinition(definitionLine: DefinitionLine): ErrorDefinition {
+        const { name, id } = definitionLine;
+        if (id === null) {
+            throw new Error(`"${name}" error is missing value.`);
+        }
+        return new ErrorDefinition(name, id);
     }
 }
 

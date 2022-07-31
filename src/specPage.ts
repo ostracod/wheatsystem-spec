@@ -4,7 +4,7 @@ import * as pathUtils from "path";
 import { projectDirectoryPath } from "./constants.js";
 import * as specUtils from "./specUtils.js";
 import { Specification } from "./specification.js";
-import { instructionSpecification } from "./instances.js";
+import { errorSpecification, instructionSpecification } from "./instances.js";
 
 export abstract class SpecPage {
     name: string;
@@ -36,7 +36,7 @@ export abstract class SpecPage {
 export class BytecodePage extends SpecPage {
     
     constructor() {
-        super("bytecode", [instructionSpecification]);
+        super("bytecode", [errorSpecification, instructionSpecification]);
     }
 }
 

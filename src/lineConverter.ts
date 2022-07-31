@@ -21,6 +21,14 @@ export abstract class LineConverter {
     }
 }
 
+export class ErrorLineConverter extends LineConverter {
+    
+    convertDefinitionLine(definitionLine: DefinitionLine): string {
+        const valueText = specUtils.convertNumberToHexadecimal(definitionLine.id);
+        return `<p><span class="code">${definitionLine.name}</span> error code = <span class="code">${valueText}</span></p>`;
+    }
+}
+
 export class InstructionLineConverter extends LineConverter {
     
     convertDefinitionLine(definitionLine: DefinitionLine): string {
