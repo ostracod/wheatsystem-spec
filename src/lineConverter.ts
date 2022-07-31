@@ -46,11 +46,22 @@ export class InstructionLineConverter extends LineConverter {
 export class FunctionLineConverter extends LineConverter {
     
     convertDefinitionLine(definitionLine: DefinitionLine): string {
-        return "TODO: Convert to HTML.";
+        const { memberLines } = definitionLine;
+        let argsText: string;
+        if (memberLines.length > 0) {
+            const textList = memberLines.map((memberLine) => (
+                `    ${memberLine.type.toString()} ${memberLine.name}`
+            ));
+            argsText = `\n${textList.join(",\n")}\n`;
+        } else {
+            argsText = "";
+        }
+        return `<pre class="code">${definitionLine.name}(${argsText})</pre>`;
     }
     
     convertIdLine(idLine: IdLine): string {
-        return "TODO: Convert to HTML.";
+        const { definitionLine } = idLine;
+        return `<li><span class="code">${definitionLine.name}</span> function ID = ${definitionLine.id}</li>`
     }
 }
 

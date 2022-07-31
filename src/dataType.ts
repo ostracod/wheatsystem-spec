@@ -6,6 +6,10 @@ export class DataType {
         this.isConstant = false;
     }
     
+    toString(): string {
+        throw new Error("toString is not yet implemented for this data type.");
+    }
+    
     toFriendlyString(isPlural: boolean): string {
         return "data " + (isPlural ? "buffers" : "buffer");
     }
@@ -19,6 +23,14 @@ export class IntegerType extends DataType {
         super();
         this.isSigned = isSigned;
         this.bitAmount = bitAmount;
+    }
+    
+    toString(): string {
+        if (this.isSigned !== null && this.isSigned && this.bitAmount !== null) {
+            return "s" + this.bitAmount;
+        } else {
+            return super.toString();
+        }
     }
     
     toFriendlyString(isPlural: boolean): string {
