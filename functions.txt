@@ -31,7 +31,7 @@ $ wrtTerm = 5
     @ ID
     > (sInt32) x = Horizontal coordinate
     > (sInt32) y = Vertical coordinate
-    > (ptr array sInt8) text = Pointer to text allocation
+    > (ptr array sInt8) text = Text to write
 
 $ termInput = 6
     # Invoked by a terminal driver to notify the receiving observer when a key has been typed.
@@ -70,7 +70,7 @@ $ wrtSerial = 9
     # Causes the receiving serial driver to output data over the given serial port.
     @ ID
     > (sInt8) port = Serial port number
-    > (ptr) buff = Pointer to buffer allocation
+    > (ptr) buff = Buffer to write
 
 $ serialInput = 10
     # Invoked by a serial driver to notify the receiving observer when a serial byte has been ingested.
@@ -94,7 +94,6 @@ $ setGpioMode = 11
     * Digital write = 2
     * Analog write = 3
 
-
 $ readGpio = 12
     # Reads a digital or analog value from the given GPIO pin.
     @ ID
@@ -106,5 +105,97 @@ $ wrtGpio = 13
     @ ID
     > (sInt32) pin = GPIO pin number
     > (sInt32) value = Value to write
+
+! SHELL FUNCTIONS
+
+# A shell implements the following functions:
+* `newWindow`
+* `delWindow`
+* `displayWindowMessage`
+* `promptWindowOption`
+* `promptWindowText`
+* `clrWindow`
+* `windowTermSize`
+* `readWindowTerm`
+* `wrtWindowTerm`
+# The standard system shell is optional for WheatSystem distributions. If available, the standard system shell has the file name `wsShell`.
+# A function implemented by the shell will throw `permErr` if all of the conditions below are true:
+* The function accepts a window handle as an input argument
+* The caller is not the owner of the window handle
+* The caller does not hold admin permission
+
+$ newWindow = 14
+    # Creates a new window which allows interaction with the user. All shell implementations can display text in windows, while graphics are only supported on certain platforms. The caller of `newWindow` is considered to be the owner of the window. If the user presses a key while the window is focused, the shell will call `windowKeyPressed` on the window owner. If the user requests to close the window, the shell will call `reqDelWindow` on the window owner.
+    @ ID
+    > (ptr) dest = Destination for the new window handle
+    > (ptr array sInt8) title = Title for the window
+
+$ reqDelWindow = 15
+    # Invoked by the shell to notify the receiving window owner when the user has requested to close the given window. If the window owner does not implement `reqDelWindow`, the shell will delete the window immediately.
+    @ ID
+    > (ptr) window = Window handle
+
+$ delWindow = 16
+    # Deletes the given window.
+    @ ID
+    > (ptr) window = Window handle
+
+$ displayWindowMessage = 17
+    # Displays a message in the given window, and waits for the user to dismiss the message. If the message is too long to fit in the window, the user can scroll up and down to view the whole message. `dest` will be set to 1 if the user pressed the escape key, and 0 for all other keys.
+    @ ID
+    > (sInt8) dest = Destination for whether escape key was pressed
+    > (ptr) window = Window handle
+    > (ptr array sInt8) message = Message to display
+
+$ promptWindowOption = 18
+    # Displays a list of options in the given window, and waits for the user to select an option. If `message` is null, then no message will be displayed above the options. If the user presses the escape key, `dest` will be set to -1.
+    @ ID
+    > (sInt32) dest = Destination for index of selected option
+    > (ptr) window = Window handle
+    > (ptr array sInt8) message = Message to display above options
+    > (ptr array ptr array sInt8) options = List of strings for the options
+
+$ promptWindowText = 19
+    # Prompts the user to enter a line of text in the given window. Newlines are not supported in the text entry. If `message` is null, then no message will be displayed above the text entry. If `startText` is null, then the initial contents of the text entry will be empty. If the user presses the escape key, `dest` will be set to null.
+    @ ID
+    > (ptr array sInt8) dest = Destination for the typed text
+    > (ptr) window = Window handle
+    > (ptr array sInt8) message = Message to display above text entry
+    > (ptr array sInt8) startText = Initial contents of text entry
+
+$ clrWindow = 20
+    # Erases any text or graphics which are displayed in the given window.
+    @ ID
+    > (ptr) window = Window handle
+
+$ windowTermSize = 21
+    # Retrieves the width and height of the given window.
+    @ ID
+    > (sInt32) widthDest = Destination for the width
+    > (sInt32) heightDest = Destination for the height
+    > (ptr) window = Window handle
+
+$ readWindowTerm = 22
+    # Reads text which has been drawn using `wrtWindowTerm` in the given window. The character position to read will wrap around to the next line after it reaches the end of the window.
+    @ ID
+    > (ptr array sInt8) dest = Destination for the text
+    > (ptr) window = Window handle
+    > (sInt32) x = Horizontal coordinate
+    > (sInt32) y = Vertical coordinate
+    > (sInt32) length = Length of text to read
+
+$ wrtWindowTerm = 23
+    # Displays text in the given window. Text will wrap around to the next line after it reaches the end of the window.
+    @ ID
+    > (ptr) window = Window handle
+    > (sInt32) x = Horizontal coordinate
+    > (sInt32) y = Vertical coordinate
+    > (ptr array sInt8) text = Text to write
+
+$ windowKeyPressed = 24
+    # Invoked by the shell to notify the receiving window owner when the user has pressed a key. Note that the shell will not call `windowKeyPressed` while `displayWindowMessage`, `promptWindowOption`, or `promptWindowText` are running.
+    @ ID
+    > (ptr) window = Window handle
+    > (sInt8) key = Typed key code
 
 
