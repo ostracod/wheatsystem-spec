@@ -10,8 +10,12 @@ export class DataType {
         throw new Error("toString is not yet implemented for this data type.");
     }
     
-    toFriendlyString(isPlural: boolean): string {
+    toFriendlyStringHelper(isPlural: boolean): string {
         return "data " + (isPlural ? "buffers" : "buffer");
+    }
+    
+    toFriendlyString(isPlural: boolean): string {
+        return (this.isConstant ? "constant " : "") + this.toFriendlyStringHelper(isPlural);
     }
 }
 
@@ -33,7 +37,7 @@ export class IntegerType extends DataType {
         }
     }
     
-    toFriendlyString(isPlural: boolean): string {
+    toFriendlyStringHelper(isPlural: boolean): string {
         let text = isPlural ? "integers" : "integer";
         if (this.bitAmount !== null) {
             text = `${this.bitAmount}-bit ${text}`;
@@ -57,7 +61,7 @@ export class PointerType extends IntegerType {
         this.elementType = elementType;
     }
     
-    toFriendlyString(isPlural: boolean): string {
+    toFriendlyStringHelper(isPlural: boolean): string {
         let text = isPlural ? "pointers" : "pointer";
         if (this.elementType !== null) {
             text +=  " to " + this.elementType.toFriendlyString(false);
@@ -76,7 +80,7 @@ export class ArrayType extends DataType {
         this.length = length;
     }
     
-    toFriendlyString(isPlural: boolean): string {
+    toFriendlyStringHelper(isPlural: boolean): string {
         let text = isPlural ? "arrays" : "array";
         if (this.length !== null) {
             text += " with length " + this.length;
@@ -90,14 +94,14 @@ export class ArrayType extends DataType {
 
 export class FileHandleType extends DataType {
     
-    toFriendlyString(isPlural: boolean): string {
+    toFriendlyStringHelper(isPlural: boolean): string {
         return "file " + (isPlural ? "handles" : "handle");
     }
 }
 
 export class AppHandleType extends FileHandleType {
     
-    toFriendlyString(isPlural: boolean): string {
+    toFriendlyStringHelper(isPlural: boolean): string {
         return "app " + (isPlural ? "handles" : "handle");
     }
 }

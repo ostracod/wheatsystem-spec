@@ -125,7 +125,7 @@ $ wrtGpio = 13
 * The caller does not hold admin permission
 
 $ newWindow = 14
-    # Creates a new window which allows interaction with the user. All shell implementations can display text in windows, while graphics are only supported on certain platforms. The caller of `newWindow` is considered to be the owner of the window. If the user presses a key while the window is focused, the shell will call `windowKeyPressed` on the window owner. If the user requests to close the window, the shell will call `reqDelWindow` on the window owner.
+    # Creates a new window which allows interaction with the user. All shell implementations can display text in windows, while graphics are only supported on certain platforms. The caller of `newWindow` is considered to be the owner of the window. If `title` is null, the title of the window will be the file name of the caller. If the user presses a key while the window is focused, the shell will call `windowKeyPressed` on the window owner. If the user requests to close the window, the shell will call `reqDelWindow` on the window owner.
     @ ID
     > (ptr) dest = Destination for the new window handle
     > (ptr array sInt8) title = Title for the window
