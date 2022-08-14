@@ -56,6 +56,12 @@ $ setAllocAttrs = 0x08
     > (ptr) alloc = Heap allocation
     > (sInt8) attrs = Allocation attributes
 
+$ testAndSet = 0x09
+    # Atomically reads a value in memory and sets the value to 1.
+    @ OPCODE
+    > (sInt8) dest = Destination for old flag value
+    > (sInt8) flag = Flag to test and set
+
 ! CONTROL FLOW INSTRUCTIONS
 
 $ jmp = 0x10
