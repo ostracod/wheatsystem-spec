@@ -198,4 +198,10 @@ $ windowKeyPressed = 24
     > (ptr) window = Window handle
     > (sInt8) key = Typed key code
 
+$ windowFocusChanged = 25
+    # Invoked by the shell to notify the receiving window owner when the window has changed focus. A focused window is visible to the user and registers key presses.
+    @ ID
+    > (ptr) window = Window handle
+    > (sInt8) hasFocus = Whether the window has focus
+
 
