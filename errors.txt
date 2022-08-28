@@ -37,6 +37,7 @@ $ dataErr = 0x09
     # Thrown if an argument data structure contains malformed data. This includes the following circumstances:
     * A file position parameter in a bytecode application file has an unexpected value
     * A region size parameter in a bytecode application file has an unexpected value
+    * An application tries to access a gate owned by another application
 
 $ argFrameErr = 0x0A
     # Thrown when an argument frame is missing or has an invalid size. This includes the following circumstances:

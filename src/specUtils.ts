@@ -1,6 +1,6 @@
 
 import { SpecLine, DefinitionLine, IdLine, MemberLine, TitleLine, DescriptionLine, BulletLine } from "./specLine.js";
-import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandleType } from "./dataType.js";
+import { DataType, IntegerType, PointerType, ArrayType, FileHandleType, AppHandleType, GateType } from "./dataType.js";
 import { SpecBlock, LineBlock, ListBlock } from "./specBlock.js";
 
 const indentationText = "    ";
@@ -11,6 +11,7 @@ const typeCreatorMap: { [name: string]: () => DataType } = {
     sInt32: () => new IntegerType(true, 32),
     fileHandle: () => new FileHandleType(),
     appHandle: () => new AppHandleType(),
+    gate: () => new GateType(),
 };
 
 export const convertNumberToHexadecimal = (value: number, length = 2): string => {

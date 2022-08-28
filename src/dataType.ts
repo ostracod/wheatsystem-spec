@@ -106,4 +106,11 @@ export class AppHandleType extends FileHandleType {
     }
 }
 
+export class GateType extends DataType {
+    
+    toFriendlyStringHelper(isPlural: boolean): string {
+        return isPlural ? "gates" : "gate";
+    }
+}
+
 

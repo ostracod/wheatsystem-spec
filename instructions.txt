@@ -56,12 +56,6 @@ $ setAllocAttrs = 0x08
     > (ptr) alloc = Heap allocation
     > (sInt8) attrs = Allocation attributes
 
-$ testAndSet = 0x09
-    # Atomically reads a value in memory and sets the value to 1.
-    @ OPCODE
-    > (sInt8) dest = Destination for old flag value
-    > (sInt8) flag = Flag to test and set
-
 ! CONTROL FLOW INSTRUCTIONS
 
 $ jmp = 0x10
@@ -84,66 +78,93 @@ $ jmpNZ = 0x12
     > (sInt) cond = Condition value
     * Throws `indexErr` if `instrOffset` is outside instruction body bounds.
 
-$ wait = 0x13
-    # Blocks execution of the current function invocation, unless the `wait` instruction has been excused from blocking. Will stop blocking if the current app calls the `resume` instruction in another thread.
-    @ OPCODE
+! GATE INSTRUCTIONS
 
-$ resume = 0x14
-    # Causes all function invocations belonging to the current app to become unblocked. If no function invocations are blocked, then the next `wait` instruction is excused from blocking.
+$ newGate = 0x20
+    # Creates a new gate to facilitate synchronization of function invocations within the current application. The current application is considered to be the owner of the new gate. If an application quits, all gates owned by the application will be deleted.
     @ OPCODE
+    > (ptr gate) dest = Destination for the gate sentry
+    > (sInt8) mode = Mode for the new gate
+
+$ delGate = 0x21
+    # Deletes the given gate.
+    @ OPCODE
+    > (ptr gate) gate = Gate sentry
+
+$ waitGate = 0x22
+    # Blocks execution of the current function invocation if the given gate is closed. If another thread in the current app calls `openGate` on the gate, execution will resume. If the gate mode is 1, the gate will close after calling `waitGate`.
+    @ OPCODE
+    > (ptr gate) gate = Gate sentry
+    * Throws `missingErr` if the gate is deleted while waiting
+
+$ openGate = 0x23
+    # Causes the given gate to open. If the gate mode is 0, then `openGate` will resume all threads blocked by `waitGate`. If the gate mode is 1, then `openGate` will resume only one thread blocked by `waitGate`, and `waitGate` will immediately close the gate again.
+    @ OPCODE
+    > (ptr gate) gate = Gate sentry
+
+$ closeGate = 0x24
+    # Causes the given gate to close, so that `waitGate` will block thread execution.
+    @ OPCODE
+    > (ptr gate) gate = Gate sentry
+
+$ setGateMode = 0x25
+    # Changes the mode of the given gate.
+    @ OPCODE
+    > (ptr gate) gate = Gate sentry
+    > (sInt8) mode = New mode for the gate
 
 ! ERROR INSTRUCTIONS
 
-$ setErrJmp = 0x20
+$ setErrJmp = 0x30
     # Configures an error handler within the current function. If an error is thrown, control flow will jump to the error handler.
     @ OPCODE
     > (const sInt) instrOffset = File offset from start of instruction body
 
-$ clrErrJmp = 0x21
+$ clrErrJmp = 0x31
     # Removes any error handler from the current function. If an error is thrown, it will be passed to the invoking function.
     @ OPCODE
 
-$ throw = 0x22
+$ throw = 0x32
     # Throws an error which will be handled by the invoking function. The error code must be in the range of `s8`.
     @ OPCODE
     > (sInt8) errCode = Error code
     * Throws `numRangeErr` if `code` is not in the range of `s8`.
 
-$ err = 0x23
+$ err = 0x33
     # Retrieves the code of the last error which was caught in the current function. The result will be 0 if no error has been caught by an error handler.
     @ OPCODE
     > (sInt8) dest = Destination for the error code
 
 ! FUNCTION INSTRUCTIONS
 
-$ findFunc = 0x30
+$ findFunc = 0x40
     # Searches for a function with the given ID in the given application. If such a function is not found, the result is -1.
     @ OPCODE
     > (sInt) dest = Destination for the function index
     > (ptr appHandle) appHandle = Application file handle
     > (sInt) funcId = Function ID
 
-$ call = 0x31
+$ call = 0x41
     # Invokes a function which is defined in the current application.
     @ OPCODE
     > (sInt) funcIndex = Index of a function in the function table
 
-$ callRemote = 0x32
+$ callRemote = 0x42
     # Invokes a function which may be defined in another application.
     @ OPCODE
     > (ptr appHandle) appHandle = Application file handle
     > (sInt) funcIndex = Index of a function in the function table
 
-$ ret = 0x33
+$ ret = 0x43
     # Exits the current function and returns control flow to the invoking function.
     @ OPCODE
 
-$ caller = 0x34
+$ caller = 0x44
     # Retrieves the file handle of the application which invoked the current function.
     @ OPCODE
     > (ptr appHandle) dest = Destination for the application file handle
 
-$ funcIsGuarded = 0x35
+$ funcIsGuarded = 0x45
     # Retrieves whether the function defined in the given application is guarded.
     @ OPCODE
     > (sInt8) dest = Destination for the result
@@ -152,41 +173,41 @@ $ funcIsGuarded = 0x35
 
 ! BITWISE INSTRUCTIONS
 
-$ bNot = 0x40
+$ bNot = 0x50
     # Performs bitwise NOT with the given value.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value = Operand
 
-$ bOr = 0x41
+$ bOr = 0x51
     # Performs bitwise OR with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ bAnd = 0x42
+$ bAnd = 0x52
     # Performs bitwise AND with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ bXor = 0x43
+$ bXor = 0x53
     # Performs bitwise XOR with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ bLeft = 0x44
+$ bLeft = 0x54
     # Performs bitshift left with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = Value to shift
     > (sInt8) value2 = Amount by which to shift
 
-$ bRight = 0x45
+$ bRight = 0x55
     # Performs bitshift right with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
@@ -195,28 +216,28 @@ $ bRight = 0x45
 
 ! COMPARISON INSTRUCTIONS
 
-$ equ = 0x50
+$ equ = 0x60
     # Determines whether the given values are equal.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ nEqu = 0x51
+$ nEqu = 0x61
     # Determines whether the given values are not equal.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ gre = 0x52
+$ gre = 0x62
     # Determines whether the first value is greater than the second value.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ nGre = 0x53
+$ nGre = 0x63
     # Determines whether the first value is not greater than the second value.
     @ OPCODE
     > (sInt8) dest = Destination for the result
@@ -225,28 +246,28 @@ $ nGre = 0x53
 
 ! ARITHMETIC INSTRUCTIONS
 
-$ add = 0x60
+$ add = 0x70
     # Performs addition with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ sub = 0x61
+$ sub = 0x71
     # Performs subtraction with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ mul = 0x62
+$ mul = 0x72
     # Performs multiplication with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = First operand
     > (sInt) value2 = Second operand
 
-$ div = 0x63
+$ div = 0x73
     # Performs division with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
@@ -254,7 +275,7 @@ $ div = 0x63
     > (sInt) value2 = Second operand
     * Throws `numRangeErr` if `value2` is zero.
 
-$ mod = 0x64
+$ mod = 0x74
     # Performs the modulo operation with the given values.
     @ OPCODE
     > (sInt) dest = Destination for the result
@@ -264,33 +285,33 @@ $ mod = 0x64
 
 ! APPLICATION INSTRUCTIONS
 
-$ launch = 0x70
+$ launch = 0x80
     # Launches the given application if it is not already running.
     @ OPCODE
     > (ptr appHandle) appHandle = Application file handle
 
-$ thisApp = 0x71
+$ thisApp = 0x81
     # Retrieves the file handle of the current application.
     @ OPCODE
     > (ptr appHandle) dest = Destination for the application file handle
 
-$ quitApp = 0x72
+$ quitApp = 0x82
     # Terminates the current application.
     @ OPCODE
 
-$ appIsRunning = 0x73
+$ appIsRunning = 0x83
     # Retrieves whether the given application is running.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (ptr appHandle) appHandle = Application file handle
 
-$ appInitErr = 0x74
+$ appInitErr = 0x84
     # Retrieves the code of the unhandled error which terminated the `init` function of the given application. The result will be 0 if the given application has no associated `init` error. The `init` error will persist until `appHandle` is deleted by the system, or until the application is launched again.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (ptr appHandle) appHandle = Application file handle
 
-$ killApp = 0x75
+$ killApp = 0x85
     # Requests for the given application to terminate.
     @ OPCODE
     > (ptr appHandle) appHandle = Application file handle
@@ -298,7 +319,7 @@ $ killApp = 0x75
 
 ! FILE INSTRUCTIONS
 
-$ newFile = 0x80
+$ newFile = 0x90
     # Creates a new file.
     @ OPCODE
     > (ptr array sInt8) name = Name of the new file
@@ -307,23 +328,23 @@ $ newFile = 0x80
     > (sInt) size = Size of the new file
     * Throws `dataErr` if `name` is longer than 127 characters, or if a file with name `name` already exists.
 
-$ delFile = 0x81
+$ delFile = 0x91
     # Deletes the given file.
     @ OPCODE
     > (ptr fileHandle) fileHandle = File handle
 
-$ openFile = 0x82
+$ openFile = 0x92
     # Retrieves a file handle for the given file. After the current application finishes using the file handle, the application should perform the `closeFile` instruction. Otherwise, the system may accumulate garbage.
     @ OPCODE
     > (ptr fileHandle) dest = Destination for the file handle
     > (ptr array sInt8) name = File name
 
-$ closeFile = 0x83
+$ closeFile = 0x93
     # Indicates to the system that the current application has finished using the given file handle. The system may delete `fileHandle` if all other applications have also closed the file handle.
     @ OPCODE
     > (ptr fileHandle) fileHandle = File handle
 
-$ readFile = 0x84
+$ readFile = 0x94
     # Reads a sequences of bytes from the given file into a buffer.
     @ OPCODE
     > (any) dest = Destination for file data
@@ -333,7 +354,7 @@ $ readFile = 0x84
     * Throws `indexErr` if `pos` is outside file bounds.
     * Throws `lenErr` if `size` reaches outside file or allocation bounds.
 
-$ wrtFile = 0x85
+$ wrtFile = 0x95
     # Writes a sequences of bytes from the given buffer into a file.
     @ OPCODE
     > (ptr fileHandle) fileHandle = File handle
@@ -345,36 +366,36 @@ $ wrtFile = 0x85
 
 ! FILE METADATA INSTRUCTIONS
 
-$ allFileNames = 0x90
+$ allFileNames = 0xA0
     # Retrieves a list of all file names in the system volume.
     @ OPCODE
     > (ptr array ptr array sInt8) dest = Destination for the list of file names
 
-$ fileExists = 0x91
+$ fileExists = 0xA1
     # Retrieves whether a file with the given name exists.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (ptr array sInt8) name = File name
 
-$ fileName = 0x92
+$ fileName = 0xA2
     # Retrieves the name of the given file.
     @ OPCODE
     > (ptr array sInt8) dest = Destination for the file name
     > (ptr fileHandle) fileHandle = File handle
 
-$ fileType = 0x93
+$ fileType = 0xA3
     # Retrieves the type of the given file.
     @ OPCODE
     > (sInt8) dest = Destination for the file type
     > (ptr fileHandle) fileHandle = File handle
 
-$ fileIsGuarded = 0x94
+$ fileIsGuarded = 0xA4
     # Retrieves whether the given file is guarded.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (ptr fileHandle) fileHandle = File handle
 
-$ fileSize = 0x95
+$ fileSize = 0xA5
     # Retrieves the size of the given file.
     @ OPCODE
     > (sInt) dest = Destination for the file size
@@ -382,46 +403,46 @@ $ fileSize = 0x95
 
 ! PERMISSION INSTRUCTIONS
 
-$ hasAdminPerm = 0xA0
+$ hasAdminPerm = 0xB0
     # Retrieves whether the given application holds admin permission.
     @ OPCODE
     > (sInt8) dest = Destination for the result
     > (ptr appHandle) appHandle = Application file handle
 
-$ giveAdminPerm = 0xA1
+$ giveAdminPerm = 0xB1
     # Grants admin permission to the given application.
     @ OPCODE
     > (ptr appHandle) appHandle = Application file handle
 
-$ delAdminPerm = 0xA2
+$ delAdminPerm = 0xB2
     # Deletes admin permission from the given application.
     @ OPCODE
     > (ptr appHandle) appHandle = Application file handle
 
 ! RESOURCE INSTRUCTIONS
 
-$ memSize = 0xB0
+$ memSize = 0xC0
     # Retrieves the total amount of memory in the system.
     @ OPCODE
     > (sInt) dest = Destination for the amount
 
-$ appMemSize = 0xB1
+$ appMemSize = 0xC1
     # Retrieves the amount of memory used by the given application.
     @ OPCODE
     > (sInt) dest = Destination for the amount
     > (ptr appHandle) appHandle = Application file handle
 
-$ memSizeLeft = 0xB2
+$ memSizeLeft = 0xC2
     # Retrieves the amount of unused memory remaining in the system.
     @ OPCODE
     > (sInt) dest = Destination for the amount
 
-$ volSize = 0xB3
+$ volSize = 0xC3
     # Retrieves the total amount of storage in the system volume.
     @ OPCODE
     > (sInt) dest = Destination for the amount
 
-$ volSizeLeft = 0xB4
+$ volSizeLeft = 0xC4
     # Retrieves the amount of unused storage remaining in the system volume.
     @ OPCODE
     > (sInt) dest = Destination for the amount
