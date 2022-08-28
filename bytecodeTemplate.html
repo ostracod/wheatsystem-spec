@@ -49,26 +49,16 @@ pre.code {
         <p>WheatBytecode is the programming language provided by WheatSystem for applications. This document describes the syntax and instructions of WheatBytecode.</p>
         <p class="title2">DATA TYPES AND STRUCTURES</p>
         <p>All integers in WheatBytecode are stored in little-endian order. All signed integers use two's complement to express negative values.</p>
-        <p>List of primitive data types:</p>
-        <ul>
-            <li><span class="code">u8</span> = Unsigned 8-bit integer</li>
-            <li><span class="code">u32</span> = Unsigned 32-bit integer</li>
-            <li><span class="code">s8</span> = Signed 8-bit integer</li>
-            <li><span class="code">s32</span> = Signed 32-bit integer</li>
-        </ul>
-        <p>Subcomponents of <span class="code">u8</span>:</p>
+        <p>Integer data types are expressed in the following manner:</p>
         <ul>
             <li><span class="code">u1</span> = Unsigned 1-bit integer</li>
             <li><span class="code">u4</span> = Unsigned 4-bit integer</li>
+            <li><span class="code">u8</span> = Unsigned 8-bit integer</li>
+            <li><span class="code">s8</span> = Signed 8-bit integer</li>
+            <li><span class="code">u32</span> = Unsigned 32-bit integer</li>
+            <li><span class="code">s32</span> = Signed 32-bit integer</li>
         </ul>
-        <pre class="code">Function table entry = [
-    s32 function ID,
-    u8 is guarded,
-    u32 argument frame size,
-    u32 local frame size,
-    u32 instruction body file position,
-    u32 instruction body size
-]</pre>
+        <p>Each bytecode application file has the following structure:</p>
         <pre class="code">Bytecode application file = [
     u32 global frame size,
     u32 function table length,
@@ -78,12 +68,22 @@ pre.code {
     Application data
 ]</pre>
         <p>Instruction bodies inside the instruction array must match the order of entries in the function table. Instruction bodies may not have unused space before or after their defined boundaries.</p>
-        <p>File types:</p>
+        <p>Each function table entry in a bytecode application file has the following structure:</p>
+        <pre class="code">Function table entry = [
+    s32 function ID,
+    u8 is guarded,
+    u32 argument frame size,
+    u32 local frame size,
+    u32 instruction body file position,
+    u32 instruction body size
+]</pre>
+        <p>File types have the following enumeration values:</p>
         <ul>
             <li><span class="code">0</span> = Generic file</li>
             <li><span class="code">1</span> = Bytecode application file</li>
             <li><span class="code">2</span> = System application file</li>
         </ul>
+        <p>Each heap allocation stores the following bitfield of attributes:</p>
         <pre class="code">Allocation attributes = [
     u1 x6 unused bits,
     u1 is sentry,
@@ -119,15 +119,17 @@ pre.code {
         <p>A heap allocation may also be marked as a sentry. A sentry allocation is intended to be referenced by multiple applications. The sentry attribute serves as a mechanism to help applications enforce type safety. All file handles are sentry allocations created by the system.</p>
         <p>Whenever a frame or a heap allocation is created, its contents are cleared so that every byte is zero. This ensures that one application cannot inspect memory which was freed by another application.</p>
         <p class="title2">INSTRUCTION SYNTAX</p>
+        <p>Each bytecode instruction has the following structure:</p>
         <pre class="code">Instruction = [
     u8 opcode,
     Array of arguments
 ]</pre>
+        <p>Each argument is preceded by a prefix which has the following structure:</p>
         <pre class="code">Argument prefix = [
     u4 reference type,
     u4 data type
 ]</pre>
-        <p>Reference types:</p>
+        <p>Argument reference types have the following enumeration values:</p>
         <ul>
             <li><span class="code">0x0</span> = Constant</li>
             <li><span class="code">0x1</span> = Global frame</li>
@@ -137,23 +139,27 @@ pre.code {
             <li><span class="code">0x5</span> = Application data region</li>
             <li><span class="code">0x6</span> = Heap allocation</li>
         </ul>
-        <p>Data types:</p>
+        <p>Argument data types have the following enumeration values:</p>
         <ul>
             <li><span class="code">0x0</span> = <span class="code">s8</span></li>
             <li><span class="code">0x1</span> = <span class="code">s32</span></li>
         </ul>
+        <p>When reference type is <span class="code">0x0</span>, the argument will have the following structure:</p>
         <pre class="code">Constant argument = [
     Argument prefix,
     Constant value
 ]</pre>
+        <p>When reference type is <span class="code">0x1</span>, <span class="code">0x2</span>, <span class="code">0x3</span>, or <span class="code">0x4</span>, the argument will have the following structure:</p>
         <pre class="code">Frame argument = [
     Argument prefix,
     Frame index as nested argument
 ]</pre>
+        <p>When reference type is <span class="code">0x5</span>, the argument will have the following structure:</p>
         <pre class="code">Application data argument = [
     Argument prefix,
     Application data index as nested argument
 ]</pre>
+        <p>When reference type is <span class="code">0x6</span>, the argument will have the following structure:</p>
         <pre class="code">Heap allocation argument = [
     Argument prefix,
     Pointer as nested argument,
