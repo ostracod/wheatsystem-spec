@@ -81,7 +81,7 @@ $ jmpNZ = 0x12
 ! GATE INSTRUCTIONS
 
 $ newGate = 0x20
-    # Creates a new gate to facilitate synchronization of function invocations within the current application. The current application is considered to be the owner of the new gate. If an application quits, all gates owned by the application will be deleted.
+    # Creates a new gate to facilitate synchronization of function invocations within the current application. The new gate will initially be in an open state. The current application is considered to be the owner of the gate. If an application quits, all gates owned by the application will be deleted.
     @ OPCODE
     > (ptr gate) dest = Destination for the gate sentry
     > (sInt8) mode = Mode for the new gate
@@ -106,12 +106,6 @@ $ closeGate = 0x24
     # Causes the given gate to close, so that `waitGate` will block thread execution.
     @ OPCODE
     > (ptr gate) gate = Gate sentry
-
-$ setGateMode = 0x25
-    # Changes the mode of the given gate.
-    @ OPCODE
-    > (ptr gate) gate = Gate sentry
-    > (sInt8) mode = New mode for the gate
 
 ! ERROR INSTRUCTIONS
 
