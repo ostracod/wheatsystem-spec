@@ -21,6 +21,7 @@ $ indexErr = 0x05
     * An index in the app data region is out of bounds
     * An index in a heap allocation is out of bounds
     * An index in a function table is out of bounds
+    * An index in a bytecode instruction body is out of bounds
 
 $ lenErr = 0x06
     # Thrown if an argument representing a length or size is invalid. This includes the following circumstances:

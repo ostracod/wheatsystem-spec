@@ -55,6 +55,8 @@ pre.code {
             <li><span class="code">u4</span> = Unsigned 4-bit integer</li>
             <li><span class="code">u8</span> = Unsigned 8-bit integer</li>
             <li><span class="code">s8</span> = Signed 8-bit integer</li>
+            <li><span class="code">u16</span> = Unsigned 16-bit integer</li>
+            <li><span class="code">s16</span> = Signed 16-bit integer</li>
             <li><span class="code">u32</span> = Unsigned 32-bit integer</li>
             <li><span class="code">s32</span> = Signed 32-bit integer</li>
         </ul>
@@ -143,11 +145,13 @@ pre.code {
             <li><span class="code">0x4</span> = Argument frame which the next function invocation will receive</li>
             <li><span class="code">0x5</span> = Application data region</li>
             <li><span class="code">0x6</span> = Heap allocation</li>
+            <li><span class="code">0x7</span> = Previous argument of same instruction</li>
         </ul>
         <p>Argument data types have the following enumeration values:</p>
         <ul>
             <li><span class="code">0x0</span> = <span class="code">s8</span></li>
-            <li><span class="code">0x1</span> = <span class="code">s32</span></li>
+            <li><span class="code">0x1</span> = <span class="code">s16</span></li>
+            <li><span class="code">0x2</span> = <span class="code">s32</span></li>
         </ul>
         <p>When reference type is <span class="code">0x0</span>, the argument will have the following structure:</p>
         <pre class="code">Constant argument = [
@@ -170,6 +174,7 @@ pre.code {
     Pointer as nested argument,
     Allocation index as nested argument
 ]</pre>
+        <p>When reference type is <span class="code">0x7</span>, the argument will only consist of an argument prefix, and the data type in the prefix will be ignored.</p>
         <p class="title2">ERROR CODES</p>
         <p>Every error code must fit within a signed 8-bit integer. The sign of each error code holds special significance:</P>
         <ul>
