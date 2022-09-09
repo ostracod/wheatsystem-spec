@@ -8,6 +8,7 @@ const typeCreatorMap: { [name: string]: () => DataType } = {
     any: () => new DataType(),
     sInt: () => new IntegerType(true),
     sInt8: () => new IntegerType(true, 8),
+    sInt16: () => new IntegerType(true, 16),
     sInt32: () => new IntegerType(true, 32),
     fileHandle: () => new FileHandleType(),
     appHandle: () => new AppHandleType(),

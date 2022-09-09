@@ -23,14 +23,14 @@ $ listenTerm = 3
 $ termSize = 4
     # Retrieves the dimensions of the terminal controlled by the receiving terminal driver. The dimensions are measured in number of characters.
     @ ID
-    > (sInt32) widthDest = Destination for the width
-    > (sInt32) heightDest = Destination for the height
+    > (sInt16) widthDest = Destination for the width
+    > (sInt16) heightDest = Destination for the height
 
 $ wrtTerm = 5 
     # Displays text on the terminal of the receiving terminal driver. Text will wrap around to the next line after it reaches the end of the screen.
     @ ID
-    > (sInt32) x = Horizontal coordinate
-    > (sInt32) y = Vertical coordinate
+    > (sInt16) x = Horizontal coordinate
+    > (sInt16) y = Vertical coordinate
     > (ptr array sInt8) text = Text to write
 
 $ termInput = 6
@@ -85,7 +85,7 @@ $ serialInput = 10
 $ setGpioMode = 11
     # Sets the I/O mode of the given GPIO pin.
     @ ID
-    > (sInt32) pin = GPIO pin number
+    > (sInt16) pin = GPIO pin number
     > (sInt8) mode = I/O mode
 
     # Available I/O modes include the following:
@@ -98,12 +98,12 @@ $ readGpio = 12
     # Reads a digital or analog value from the given GPIO pin.
     @ ID
     > (sInt32) dest = Destination for the value
-    > (sInt32) pin = GPIO pin number
+    > (sInt16) pin = GPIO pin number
 
 $ wrtGpio = 13
     # Writes a digital or analog value to the given GPIO pin.
     @ ID
-    > (sInt32) pin = GPIO pin number
+    > (sInt16) pin = GPIO pin number
     > (sInt32) value = Value to write
 
 ! SHELL FUNCTIONS
@@ -150,7 +150,7 @@ $ displayWindowMessage = 17
 $ promptWindowOption = 18
     # Displays a list of options in the given window, and waits for the user to select an option. If `message` is null, then no message will be displayed above the options. If the user presses the escape key, `dest` will be set to -1.
     @ ID
-    > (sInt32) dest = Destination for index of selected option
+    > (sInt16) dest = Destination for index of selected option
     > (ptr) window = Window handle
     > (ptr array sInt8) message = Message to display above options
     > (ptr array ptr array sInt8) options = List of strings for the options
@@ -171,8 +171,8 @@ $ clrWindow = 20
 $ windowTermSize = 21
     # Retrieves the width and height of the given window.
     @ ID
-    > (sInt32) widthDest = Destination for the width
-    > (sInt32) heightDest = Destination for the height
+    > (sInt16) widthDest = Destination for the width
+    > (sInt16) heightDest = Destination for the height
     > (ptr) window = Window handle
 
 $ readWindowTerm = 22
@@ -180,16 +180,16 @@ $ readWindowTerm = 22
     @ ID
     > (ptr array sInt8) dest = Destination for the text
     > (ptr) window = Window handle
-    > (sInt32) x = Horizontal coordinate
-    > (sInt32) y = Vertical coordinate
+    > (sInt16) x = Horizontal coordinate
+    > (sInt16) y = Vertical coordinate
     > (sInt32) length = Length of text to read
 
 $ wrtWindowTerm = 23
     # Displays text in the given window. Text will wrap around to the next line after it reaches the end of the window.
     @ ID
     > (ptr) window = Window handle
-    > (sInt32) x = Horizontal coordinate
-    > (sInt32) y = Vertical coordinate
+    > (sInt16) x = Horizontal coordinate
+    > (sInt16) y = Vertical coordinate
     > (ptr array sInt8) text = Text to write
 
 $ windowKeyPressed = 24
