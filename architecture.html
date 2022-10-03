@@ -49,7 +49,7 @@ pre.code {
     <body>
         <p class="title1">WHEATSYSTEM 1.0.0 ARCHITECTURE</p>
         <p style="color: #CC0000;">(Rough Draft)</p>
-        <p>WheatSystem is a primitive operating system designed by Jack Eisenmann. This document describes the design elements of WheatSystem.</p>
+        <p>WheatSystem is an operating system designed by Jack Eisenmann. This document describes the design elements of WheatSystem.</p>
         <p class="title2">DESIGN GOALS</p>
         <ul>
             <li>Minimalism: The system should have a simple design.</li>
@@ -76,7 +76,7 @@ pre.code {
         <p class="title2">FILE SYSTEM</p>
         <p>The system maintains a single volume for non-volatile storage of files. The volume may store any number of uniquely named files at the top level. The system does not support directories or any kind of nested file structure. Each file name may be no longer than 127 characters.</p>
         <p>If a file name begins with the prefix <span class="code">ws</span>, the file is defined as part of the WheatSystem specification. This convention helps avoid name collisions with third-party files.</p>
-        <p>Upon start-up, the system will launch an application named <span class="code">wsBoot</span> in the system volume. If no such application is found, the system will become inactive.</p>
+        <p>Upon start-up, the system will launch the application named <span class="code">wsBoot</span> in the system volume. If no such application is found, the system will become inactive.</p>
         <p>Every file has one of the following types:</p>
         <ul>
             <li>Generic file</li>
@@ -86,7 +86,13 @@ pre.code {
         <p>A generic file does not hold special significance in the system. A generic file can store any sort of data.</p>
         <p>A bytecode application file contains WheatBytecode instructions for user applications. Please see this page for details about WheatBytecode:</p>
         <p><a href="bytecode.html">WheatBytecode Documentation</a></p>
-        <p>A system application file is used to access hardware features of the machine. A system application file does not contain any bytecode or machine code. Instead, the file contains an enumeration value which is consumed by the operating system. This enumeration value indicates which hardware feature to use. Enumeration values are specific to each system implementation, and are generally incompatible across machines.</p>
+        <p>A system application file is used to access hardware features of the machine. A system application file does not contain any bytecode or machine code. Instead, the file contains an enumeration value which is consumed by the operating system. This enumeration value indicates the set of functions which should be exposed. Enumeration values are specific to each system implementation, and are generally incompatible across machines.</p>
+        <p>Bytecode applications and system applications have the following similarities:</p>
+        <ul>
+            <li>Both may expose functions which can be called by other applications</li>
+            <li>Both are subject to the constraints of the permission system</li>
+            <li>Both may be throttled by the resource system to free memory</li>
+        </ul>
         <p class="title2">APPLICATION SYSTEM</p>
         <p>The system supports multiple applications running concurrently. However, only one running application instance may be launched from each application file. The bytecode runtime environment will interleave application execution so that each instruction is evaluated atomically.</p>
         <p>Every application uses the same unified heap for dynamic memory allocation. Applications must manage garbage collection of their heap allocations. If an application quits, the system will delete every heap allocation created by the application.</p>
@@ -154,6 +160,7 @@ pre.code {
         <p><span class="code">term</span> = Terminal</p>
         <p><span class="code">vol</span> = Volume</p>
         <p><span class="code">wrt</span> = Write</p>
+        <p><span class="code">ws</span> = WheatSystem</p>
     </body>
 </html>
 

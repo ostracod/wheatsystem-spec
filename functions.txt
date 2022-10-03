@@ -125,7 +125,7 @@ $ wrtGpio = 13
 * The caller does not hold admin permission
 
 $ newWindow = 14
-    # Creates a new window which allows interaction with the user. All shell implementations can display text in windows, while graphics are only supported on certain platforms. The caller of `newWindow` is considered to be the owner of the window. If `title` is null, the title of the window will be the file name of the caller. If the user presses a key while the window is focused, the shell will call `windowKeyPressed` on the window owner. If the user requests to close the window, the shell will call `reqDelWindow` on the window owner.
+    # Creates a new window which allows interaction with the user. All shell implementations can display text in windows, while graphics are only supported on certain platforms. The caller of `newWindow` is considered to be the owner of the window. If `title` is null, the title of the window will be the file name of the caller. If the user presses a key while the window is focused, the shell will call `windowKeyPressed` on the window owner. If the window changes focus, the shell will call `windowFocusChanged` on the window owner. If the user requests to close the window, the shell will call `reqDelWindow` on the window owner.
     @ ID
     > (ptr) dest = Destination for the new window handle
     > (ptr array sInt8) title = Title for the window
@@ -193,7 +193,7 @@ $ wrtWindowTerm = 23
     > (ptr array sInt8) text = Text to write
 
 $ windowKeyPressed = 24
-    # Invoked by the shell to notify the receiving window owner when the user has pressed a key. Note that the shell will not call `windowKeyPressed` while `displayWindowMessage`, `promptWindowOption`, or `promptWindowText` are running.
+    # Invoked by the shell to notify the receiving window owner when the user has pressed a key. This function uses the same key codes as the function `termInput`. The system menu key will not be passed through `windowKeyPressed`, and is instead used to display a menu in the shell. Note that the shell will not call `windowKeyPressed` while `displayWindowMessage`, `promptWindowOption`, or `promptWindowText` are running.
     @ ID
     > (ptr) window = Window handle
     > (sInt8) key = Typed key code

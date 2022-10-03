@@ -4,7 +4,7 @@ $ genericErr = 0x01
 
 $ noImplErr = 0x02
     # Thrown if no implementation is available for the given operation. This includes the following circumstances:
-    * The interpreter tries to evaluate an instruction which has an unknown opcode
+    * The bytecode interpreter tries to evaluate an instruction which has an unknown opcode
 
 $ typeErr = 0x03
     # Thrown if a value or resource has the wrong type. This includes the following circumstances:

@@ -152,7 +152,7 @@ $ clrErrJmp = 0x31
     @ OPCODE
 
 $ throw = 0x32
-    # Throws an error which will be handled by the invoking function. The error code must be in the range of `s8`.
+    # Throws an error which will be handled by the invoking function, or by the error handler in the current function. The error code must be in the range of `s8`.
     @ OPCODE
     > (sInt8) errCode = Error code
     * Throws `numRangeErr` if `code` is not in the range of `s8`.
@@ -165,7 +165,7 @@ $ err = 0x33
 ! FUNCTION INSTRUCTIONS
 
 $ findFunc = 0x40
-    # Searches for a function with the given ID in the given application. If such a function is not found, the result is -1.
+    # Searches for a function having an ID in the given application. If such a function is not found, the result is -1.
     @ OPCODE
     > (sInt) dest = Destination for the function index
     > (ptr appHandle) appHandle = Application file handle
@@ -235,7 +235,7 @@ $ bLeft = 0x54
     > (sInt8) value2 = Amount by which to shift
 
 $ bRight = 0x55
-    # Performs bitshift right with the given values.
+    # Performs bitshift right with the given values. The leftmost bits will be filled with zeros.
     @ OPCODE
     > (sInt) dest = Destination for the result
     > (sInt) value1 = Value to shift
