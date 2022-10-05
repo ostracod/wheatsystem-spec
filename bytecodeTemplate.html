@@ -70,6 +70,7 @@ pre.code {
     Application data
 ]</pre>
         <p>The function table provides metadata for all functions in the application, while the instruction array contains bodies of bytecode instructions. Each function table entry references an instruction body. Instruction bodies in the instruction array must match the order of entries in the function table. Instruction bodies may not have unused space before or after their defined boundaries.</p>
+        <p>The application data region stores constant data which the application may read during runtime. Values in the application data region cannot be modified.</p>
         <p>Each function table entry in a bytecode application file has the following structure:</p>
         <pre class="code">Function table entry = [
     s32 function ID,

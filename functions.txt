@@ -13,7 +13,7 @@ $ kill = 2
 
 ! TERMINAL DRIVER FUNCTIONS
 
-# A terminal driver implements the functions `listenTerm`, `termSize`, and `wrtTerm`. The standard system terminal driver is optional for WheatSystem distributions. If available, the standard system terminal driver has the file name `wsTerm`.
+# A terminal driver is an application which can display text on a terminal and receive keystroke input. A terminal driver must implement the functions `listenTerm`, `termSize`, and `wrtTerm`. The standard system terminal driver is optional for WheatSystem distributions. If available, the standard system terminal driver has the file name `wsTerm`.
 
 $ listenTerm = 3
     # Causes the calling application to become an observer of the receiving terminal driver. When the terminal driver registers a typed key, it will invoke the `termInput` function of its observer. Each terminal driver may have at most one observer. If another application invokes `listenTerm`, it will become the new observer.
@@ -53,7 +53,7 @@ $ termInput = 6
 
 ! SERIAL DRIVER FUNCTIONS
 
-# A serial driver implements the functions `startSerial`, `stopSerial`, and `wrtSerial`. The standard system serial driver is optional for WheatSystem distributions. If available, the standard system serial driver has the file name `wsSerial`.
+# A serial driver is an application which can send and receive data over serial ports. A serial driver must implement the functions `startSerial`, `stopSerial`, and `wrtSerial`. The standard system serial driver is optional for WheatSystem distributions. If available, the standard system serial driver has the file name `wsSerial`.
 
 $ startSerial = 7
     # Causes the receiving serial driver to open the given serial port, and assigns the calling application as an observer. When the port receives input data, the serial driver will will invoke the `serialInput` function on the port's observer.
@@ -80,7 +80,7 @@ $ serialInput = 10
 
 ! GPIO DRIVER FUNCTIONS
 
-# A GPIO driver implements the functions `setGpioMode`, `readGpio`, and `wrtGpio`. The standard system GPIO driver is optional for WheatSystem distributions. If available, the standard system GPIO driver has the file name `wsGpio`.
+# A GPIO driver is an application which can read and write signals through general-purpose I/O pins. A GPIO driver must implement the functions `setGpioMode`, `readGpio`, and `wrtGpio`. The standard system GPIO driver is optional for WheatSystem distributions. If available, the standard system GPIO driver has the file name `wsGpio`.
 
 $ setGpioMode = 11
     # Sets the I/O mode of the given GPIO pin.
@@ -106,9 +106,9 @@ $ wrtGpio = 13
     > (sInt16) pin = GPIO pin number
     > (sInt32) value = Value to write
 
-! SHELL FUNCTIONS
+! WHEATSHELL FUNCTIONS
 
-# A shell implements the following functions:
+# WheatShell is an application which can display windows to the user and accept user input. The shell must implement the following functions:
 * `newWindow`
 * `delWindow`
 * `displayWindowMessage`
@@ -118,14 +118,14 @@ $ wrtGpio = 13
 * `windowTermSize`
 * `readWindowTerm`
 * `wrtWindowTerm`
-# The standard system shell is optional for WheatSystem distributions. If available, the standard system shell has the file name `wsShell`.
+# WheatShell is optional for WheatSystem distributions. If available, the shell has the file name `wsShell`.
 # A function implemented by the shell will throw `permErr` if all of the conditions below are true:
 * The function accepts a window handle as an input argument
 * The caller is not the owner of the window handle
 * The caller does not hold admin permission
 
 $ newWindow = 14
-    # Creates a new window which allows interaction with the user. All shell implementations can display text in windows, while graphics are only supported on certain platforms. The caller of `newWindow` is considered to be the owner of the window. If `title` is null, the title of the window will be the file name of the caller. If the user presses a key while the window is focused, the shell will call `windowKeyPressed` on the window owner. If the window changes focus, the shell will call `windowFocusChanged` on the window owner. If the user requests to close the window, the shell will call `reqDelWindow` on the window owner.
+    # Creates a new window which allows interaction with the user. All WheatShell implementations can display text in windows, while graphics are only supported on certain platforms. The caller of `newWindow` is considered to be the owner of the window. If `title` is null, the title of the window will be the file name of the caller. If the user presses a key while the window is focused, the shell will call `windowKeyPressed` on the window owner. If the window changes focus, the shell will call `windowFocusChanged` on the window owner. If the user requests to close the window, the shell will call `reqDelWindow` on the window owner.
     @ ID
     > (ptr) dest = Destination for the new window handle
     > (ptr array sInt8) title = Title for the window
